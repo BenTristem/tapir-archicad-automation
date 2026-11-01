@@ -1,9 +1,8 @@
 {
- "generatedAt": "2026-10-26 16:26 UTC",
+ "generatedAt": "2026-11-01 15:56 UTC",
  "counts": {
   "done": 302,
-  "open": 116,
-  "in progress": 11,
+  "open": 127,
   "not applicable": 1
  },
  "parameters": {
@@ -923,19 +922,14 @@
    "group": "Project Commands",
    "version": "1.7.2",
    "brief": "Gets pages of the project preferences (Options > Project Preferences): the working units, the dimensions and the calculation units. Further pages may follow.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 1,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1030,
-     "title": "[4/4] Add the GetProjectPreferences and SetProjectPreferences Grasshopper components"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -943,19 +937,14 @@
    "group": "Project Commands",
    "version": "1.7.2",
    "brief": "Changes pages of the project preferences (Options > Project Preferences): the working units, the dimensions and the calculation units. Only the given fields change, the rest of each page keeps its value. In Teamwork the PreferencesDialog lockable object set has to be reserved first (ReserveLockableObjectSet). Available from Archicad 27.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 21,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1030,
-     "title": "[4/4] Add the GetProjectPreferences and SetProjectPreferences Grasshopper components"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -1297,12 +1286,7 @@
    ],
    "missingParameters": [],
    "pullRequests": [],
-   "issues": [
-    {
-     "number": 639,
-     "title": "Feature request for GetDetailsOfElements"
-    }
-   ]
+   "issues": []
   },
   {
    "id": "SetDetailsOfElements",
@@ -1662,19 +1646,14 @@
    "group": "Element Commands",
    "version": "1.7.2",
    "brief": "Creates persistent links between pairs of elements, each from one element to another, with an optional integer flags value per link. Scripts can record their own relations between elements this way (for example which label documents which column) instead of storing GUIDs in properties. The links are stored in the project and have no effect on geometry; they are independent from groups, hotlinks and solid element operations. A link is directional: it is returned by GetLinksOfElements for the element it starts from only, and removed by UnlinkElements. Undoable.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 1,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1033,
-     "title": "[2/2] Grasshopper: add LinkElements, UnlinkElements and GetLinksOfElements components"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -1682,19 +1661,14 @@
    "group": "Element Commands",
    "version": "1.7.2",
    "brief": "Removes the links created by LinkElements between the given pairs of elements. The direction matters: the link starting from fromElementId and pointing to toElementId is removed. Undoable.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 1,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1033,
-     "title": "[2/2] Grasshopper: add LinkElements, UnlinkElements and GetLinksOfElements components"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -1702,19 +1676,14 @@
    "group": "Element Commands",
    "version": "1.7.2",
    "brief": "Gets the links created by LinkElements that start from the given elements: the linked element and the flags of each link. Links pointing to an element are not returned; query the elements they start from. Returns an error item for an element that does not exist.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 1,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1033,
-     "title": "[2/2] Grasshopper: add LinkElements, UnlinkElements and GetLinksOfElements components"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -1912,12 +1881,7 @@
    ],
    "missingParameters": [],
    "pullRequests": [],
-   "issues": [
-    {
-     "number": 660,
-     "title": "HighlightElements fix"
-    }
-   ]
+   "issues": []
   },
   {
    "id": "MoveElements",
@@ -2107,16 +2071,7 @@
    ],
    "missingParameters": [],
    "pullRequests": [],
-   "issues": [
-    {
-     "number": 781,
-     "title": "Full Get/Set/Create access to Model View Option combinations, including custom GDL-contributed fields"
-    },
-    {
-     "number": 438,
-     "title": "Archicad crashes when setting GDL parameters on Curtain Wall Panel subelements (SetGDLParametersOfElements)"
-    }
-   ]
+   "issues": []
   },
   {
    "id": "SetGDLParametersOfElements",
@@ -2140,12 +2095,7 @@
    ],
    "missingParameters": [],
    "pullRequests": [],
-   "issues": [
-    {
-     "number": 438,
-     "title": "Archicad crashes when setting GDL parameters on Curtain Wall Panel subelements (SetGDLParametersOfElements)"
-    }
-   ]
+   "issues": []
   },
   {
    "id": "GetMarkerParametersOfElements",
@@ -3230,12 +3180,7 @@
    "parameterCount": 0,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1011,
-     "title": "Support Archicad 29 and 30 in ModifyOpenings"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -3257,12 +3202,7 @@
     "includeParameters"
    ],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1011,
-     "title": "Support Archicad 29 and 30 in ModifyOpenings"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -3293,12 +3233,7 @@
    "missingParameters": [
     "gridElements.lengthMode"
    ],
-   "pullRequests": [
-    {
-     "number": 1011,
-     "title": "Support Archicad 29 and 30 in ModifyOpenings"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -5207,19 +5142,14 @@
    "group": "Attribute Commands",
    "version": "1.7.2",
    "brief": "Creates attribute folders, each given by attribute type and path (the folder names from the root folder down). Missing parent folders are created too; a folder that already exists is kept and reported as success. Available from Archicad 26.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 1,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1029,
-     "title": "[4/4] Grasshopper components for the attribute folder commands"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -5227,19 +5157,14 @@
    "group": "Attribute Commands",
    "version": "1.7.2",
    "brief": "Deletes attribute folders, each given by attribute type and path, together with all the subfolders and deletable attributes they contain (a folder holding an attribute that cannot be deleted is kept). The root folder cannot be deleted. Available from Archicad 26.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 1,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1029,
-     "title": "[4/4] Grasshopper components for the attribute folder commands"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -5247,19 +5172,14 @@
    "group": "Attribute Commands",
    "version": "1.7.2",
    "brief": "Renames attribute folders, each given by attribute type and path, to the given new names. The root folder cannot be renamed. Available from Archicad 26.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 4,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1029,
-     "title": "[4/4] Grasshopper components for the attribute folder commands"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -5267,19 +5187,14 @@
    "group": "Attribute Commands",
    "version": "1.7.2",
    "brief": "Moves attributes and attribute folders (with their contents) into the target folder, which must be of the same attribute type; an empty target path is the root folder. Returns one execution result per attribute and per folder. Available from Archicad 26.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 3,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1029,
-     "title": "[4/4] Grasshopper components for the attribute folder commands"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -7250,12 +7165,7 @@
    "coveredParameters": [],
    "missingParameters": [],
    "pullRequests": [],
-   "issues": [
-    {
-     "number": 781,
-     "title": "Full Get/Set/Create access to Model View Option combinations, including custom GDL-contributed fields"
-    }
-   ]
+   "issues": []
   },
   {
    "id": "GetViewSettings",
@@ -7308,19 +7218,14 @@
    "group": "Navigator Commands",
    "version": "1.7.2",
    "brief": "Gets the graphic override combination applied to the current window, with its id and name. The response is empty when no combination is applied. This is the combination of the window itself, not the one stored in a saved view (see GetViewSettings). Available from Archicad 30.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 0,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1453,
-     "title": "[3/3] Grasshopper components for the active override combination and element override styles"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -7328,19 +7233,14 @@
    "group": "Navigator Commands",
    "version": "1.7.2",
    "brief": "Applies a graphic override combination, given by id or by name, to the current window. The current window must be a model window (floor plan, section, elevation, 3D, ...). To remove the overrides, apply the project's 'No Overrides' combination. The saved view is not changed (see SetViewSettings for that). Available from Archicad 30.",
-   "status": "in progress",
+   "status": "open",
    "reason": "",
    "components": [],
    "parameters": null,
    "parameterCount": 3,
    "coveredParameters": [],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1453,
-     "title": "[3/3] Grasshopper components for the active override combination and element override styles"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {
@@ -7661,12 +7561,7 @@
     "elements"
    ],
    "missingParameters": [],
-   "pullRequests": [
-    {
-     "number": 1001,
-     "title": "Add ZoomToElements to zoom the current 2D or 3D window to elements"
-    }
-   ],
+   "pullRequests": [],
    "issues": []
   },
   {

@@ -1,21 +1,21 @@
-**302 of 429** applicable Tapir commands have a Grasshopper component (70 %): ✅ 302 done, 🚧 11 in progress, ⬜ 116 open, ➖ 1 not applicable.
+**302 of 429** applicable Tapir commands have a Grasshopper component (70 %): ✅ 302 done, ⬜ 127 open, ➖ 1 not applicable.
 
 Parameters of the 302 used commands: 🟢 238 every parameter has an input, 🟡 45 the rest through a JSON input, 🟠 19 some parameters missing.
 
 | Command group | Used | Applicable | ✅ | 🔀 | 🚧 | 🙋 | ⬜ | ⛔ | ➖ | 🟢 | 🟡 | 🟠 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Application Commands | 47 % | 19 | 9 |  |  |  | 10 |  |  | 9 |  |  |
-| Project Commands | 80 % | 35 | 28 |  | 2 |  | 5 |  |  | 28 |  |  |
-| Element Commands | 71 % | 108 | 77 |  | 3 |  | 28 |  |  | 40 | 34 | 3 |
+| Project Commands | 80 % | 35 | 28 |  |  |  | 7 |  |  | 28 |  |  |
+| Element Commands | 71 % | 108 | 77 |  |  |  | 31 |  |  | 40 | 34 | 3 |
 | Element grouping Commands | 75 % | 8 | 6 |  |  |  | 2 |  |  | 6 |  |  |
 | Favorites Commands | 83 % | 12 | 10 |  |  |  | 2 |  |  | 9 |  | 1 |
 | Property Commands | 70 % | 17 | 12 |  |  |  | 5 |  |  | 11 |  | 1 |
 | Classification Commands | 100 % | 11 | 11 |  |  |  |  |  |  | 11 |  |  |
-| Attribute Commands | 55 % | 45 | 25 |  | 4 |  | 16 |  |  | 4 | 9 | 12 |
+| Attribute Commands | 55 % | 45 | 25 |  |  |  | 20 |  |  | 4 | 9 | 12 |
 | IFC Commands | 70 % | 10 | 7 |  |  |  | 3 |  |  | 7 |  |  |
 | Library Commands | 70 % | 10 | 7 |  |  |  | 3 |  |  | 7 |  |  |
 | Teamwork Commands | 91 % | 12 | 11 |  |  |  | 1 |  |  | 11 |  |  |
-| Navigator Commands | 56 % | 46 | 26 |  | 2 |  | 18 |  |  | 24 | 2 |  |
+| Navigator Commands | 56 % | 46 | 26 |  |  |  | 20 |  |  | 24 | 2 |  |
 | Graphic Override Commands | 0 % | 3 |  |  |  |  | 3 |  |  |  |  |  |
 | Issue Management Commands | 100 % | 11 | 11 |  |  |  |  |  |  | 11 |  |  |
 | Revision Management Commands | 83 % | 6 | 5 |  |  |  | 1 |  |  | 5 |  |  |
@@ -28,4 +28,4 @@ Parameters of the 302 used commands: 🟢 238 every parameter has an input, 🟡
 | Script UI Commands | 0 % | 2 |  |  |  |  | 2 |  |  |  |  |  |
 | Developer Commands | 0 % | 0 |  |  |  |  |  |  | 1 |  |  |  |
 
-Updated 2026-10-26 16:26 UTC.
+Updated 2026-11-01 15:56 UTC.
