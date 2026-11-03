@@ -1603,6 +1603,13 @@ GS::ObjectState CreateMEPRoutingElementsCommand::Execute (const GS::ObjectState&
                 continue;
             }
 #endif
+            // The MEP system is resolved before anything is placed, so an unknown one does not place a route without a system.
+            const GS::ObjectState* mepSystemId = routingElementData.Get ("mepSystemId");
+            const API_AttributeIndex mepSystem = mepSystemId != nullptr ? GetAttributeIndexFromGuid (API_MEPSystemID, GetGuidFromObjectState (*mepSystemId)) : ACAPI_CreateAttributeIndex (-1);
+            if (mepSystemId != nullptr && mepSystem == ACAPI_CreateAttributeIndex (-1)) {
+                elements (CreateErrorResponse (APIERR_BADID, "The 'mepSystemId' is not an MEP system attribute."));
+                continue;
+            }
 
             ACAPI::Result<RoutingElementDefault> routingElementDefault = CreateRoutingElementDefault (domain.value ());
             if (routingElementDefault.IsErr ()) {
@@ -1657,7 +1664,6 @@ GS::ObjectState CreateMEPRoutingElementsCommand::Execute (const GS::ObjectState&
                 });
             }
 
-            const GS::ObjectState* mepSystemId = routingElementData.Get ("mepSystemId");
             routingElementDefault->Modify ([&](RoutingElementDefault::Modifier& modifier) {
                 modifier.SetRoutingSegmentDefault (segmentDefault);
 #ifdef ServerMainVers_2900
@@ -1666,7 +1672,7 @@ GS::ObjectState CreateMEPRoutingElementsCommand::Execute (const GS::ObjectState&
                 }
 #endif
                 if (mepSystemId != nullptr) {
-                    modifier.SetMEPSystem (GetAttributeIndexFromGuid (API_MEPSystemID, GetGuidFromObjectState (*mepSystemId)));
+                    modifier.SetMEPSystem (mepSystem);
                 }
             });
 
@@ -2089,12 +2095,19 @@ GS::ObjectState ModifyMEPRoutingElementsCommand::Execute (const GS::ObjectState&
         }
 #endif
 
+        // The MEP system is resolved before anything is changed, so an unknown one does not clear the route's system.
+        const GS::ObjectState* mepSystemId = routingElementData.Get ("mepSystemId");
+        const API_AttributeIndex mepSystem = mepSystemId != nullptr ? GetAttributeIndexFromGuid (API_MEPSystemID, GetGuidFromObjectState (*mepSystemId)) : ACAPI_CreateAttributeIndex (-1);
+        if (mepSystemId != nullptr && mepSystem == ACAPI_CreateAttributeIndex (-1)) {
+            executionResults (CreateFailedExecutionResult (APIERR_BADID, "The 'mepSystemId' is not an MEP system attribute."));
+            continue;
+        }
+
         bool success = true;
 
-        const GS::ObjectState* mepSystemId = routingElementData.Get ("mepSystemId");
         if (mepSystemId != nullptr) {
             ACAPI::Result<void> result = routingElement->Modify ([&](RoutingElement::Modifier& modifier) {
-                modifier.SetMEPSystem (GetAttributeIndexFromGuid (API_MEPSystemID, GetGuidFromObjectState (*mepSystemId)));
+                modifier.SetMEPSystem (mepSystem);
             }, "Modify MEP System of Routing Element");
             success &= result.IsOk ();
         }
