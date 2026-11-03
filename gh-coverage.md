@@ -32,7 +32,7 @@ Parameters of the 302 used commands: 🟢 238 every parameter has an input, 🟡
 | Script UI Commands | 0 % | 2 |  |  |  |  | 2 |  |  |  |  |  |
 | Developer Commands | 0 % | 0 |  |  |  |  |  |  | 1 |  |  |  |
 
-Updated 2026-11-03 12:06 UTC.
+Updated 2026-11-03 13:10 UTC.
 
 | | Status |
 |---|---|
@@ -495,12 +495,12 @@ A parameter counts as covered when the component's code names it (a static check
 ## MEP Commands
 
 - ✅ `GetMEPElements` 🟢 2/2 parameters – `GetMEPElementsComponent`
-- ✅ `GetMEPRoutingElements` 🟢 1/1 parameters – `GetMEPRoutingElementsComponent`
+- ✅ `GetMEPRoutingElements` 🟢 1/1 parameters – `GetMEPRoutingElementsComponent` — [#12](https://github.com/ENZYME-APD/tapir-archicad-automation/issues/12 "GetMEPRoutingElements: connectionStyle vs the route dialogs (pipe Welded = SimpleBody; duct dialog disagrees after a change)")
 - ✅ `GetMEPPorts` 🟢 1/1 parameters – `GetMEPPortsComponent`
 - ✅ `GetMEPDistributionSystems` 🟢 0/0 parameters – `GetMEPDistributionSystemsComponent`
 - ✅ `CreateMEPRoutingElements` 🟢 10/10 parameters – `CreateMEPRoutingElementsComponent`
 - ✅ `CreateMEPElements` 🟢 6/6 parameters – `CreateMEPElementsComponent`
-- ✅ `ModifyMEPRoutingElements` 🟠 9/15 parameters – `ModifyMEPRoutingElementsComponent`<br><sub>no input: `routingElementsData.anchor`, `routingElementsData.branchPreferenceTableId`, `routingElementsData.flangeSize`, `routingElementsData.referenceLineOffsetX`, `routingElementsData.referenceLineOffsetY`, `routingElementsData.wallThickness`</sub>
+- ✅ `ModifyMEPRoutingElements` 🟠 9/15 parameters – `ModifyMEPRoutingElementsComponent` — [#12](https://github.com/ENZYME-APD/tapir-archicad-automation/issues/12 "GetMEPRoutingElements: connectionStyle vs the route dialogs (pipe Welded = SimpleBody; duct dialog disagrees after a change)")<br><sub>no input: `routingElementsData.anchor`, `routingElementsData.branchPreferenceTableId`, `routingElementsData.flangeSize`, `routingElementsData.referenceLineOffsetX`, `routingElementsData.referenceLineOffsetY`, `routingElementsData.wallThickness`</sub>
 - ✅ `ConnectMEPElements` 🟢 3/3 parameters – `ConnectMEPElementsComponent`
 - ✅ `GetMEPPreferenceTables` 🟠 1/2 parameters – `GetMEPPreferenceTablesComponent`<br><sub>no input: `includeFittingTables`</sub>
 - ✅ `GetMEPSystemGroups` 🟢 0/0 parameters – `GetMEPSystemGroupsComponent`

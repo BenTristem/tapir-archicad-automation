@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-03 12:06 UTC",
+ "generatedAt": "2026-11-03 13:10 UTC",
  "counts": {
   "done": 302,
   "open": 127,
@@ -8936,7 +8936,12 @@
    ],
    "missingParameters": [],
    "pullRequests": [],
-   "issues": []
+   "issues": [
+    {
+     "number": 12,
+     "title": "GetMEPRoutingElements: connectionStyle vs the route dialogs (pipe Welded = SimpleBody; duct dialog disagrees after a change)"
+    }
+   ]
   },
   {
    "id": "GetMEPPorts",
@@ -9073,7 +9078,12 @@
     "routingElementsData.wallThickness"
    ],
    "pullRequests": [],
-   "issues": []
+   "issues": [
+    {
+     "number": 12,
+     "title": "GetMEPRoutingElements: connectionStyle vs the route dialogs (pipe Welded = SimpleBody; duct dialog disagrees after a change)"
+    }
+   ]
   },
   {
    "id": "ConnectMEPElements",
