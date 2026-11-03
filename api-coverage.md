@@ -10,7 +10,7 @@ Every function of the Archicad API (C functions, the C++ API and the Archicad 25
 | C functions of Archicad 25/26 only, and their command ids | 47 % | 82 | 39 |  |  |  | 43 |  | 57 |
 | C++ API (ACAPI::, IFCAPI::) | 47 % | 1436 | 679 |  |  |  | 757 |  | 391 |
 
-Archicad 25–30 DevKits; updated 2026-11-01 15:56 UTC.
+Archicad 25–30 DevKits; updated 2026-11-03 10:53 UTC.
 
 | | Status |
 |---|---|
@@ -133,7 +133,7 @@ Names are the newest ones; older names (renamed functions, AC25/26 command ids) 
 - ✅ `ACAPI_Element_ChangeDefaultsExt` – Changes the default parameters of the Window, Door, Section, Elevation, Interior Elevation, ChangeMarker, Detail, Worksheet, or Stair default element and its marker(s). This function also allows you to change the default settings of the Curtain Wall and its subelem.
 - 🙋 `ACAPI_Element_ChangeElementInfoString` – Changes the compound info string of the given element. <sub>(was `APIDb_ChangeElementInfoStringID`)</sub> — [#1](https://github.com/ENZYME-APD/tapir-archicad-automation/issues/1 "ModifyMEPRoutingElements: set a route's insulation")
 - ✅ `ACAPI_Element_ChangeExt` – Modifies a Window, Door, Section, Elevation, Interior Elevation, ChangeMarker, Detail, Worksheet, Stair or External element in the current database.
-- ✅ `ACAPI_Element_ChangeMemo` – Changes the memo part of certain element types.
+- ✅ `ACAPI_Element_ChangeMemo` – Changes the memo part of certain element types. — [#8](https://github.com/ENZYME-APD/tapir-archicad-automation/issues/8 "ModifySlabs: polygonOutline that drops many nodes fails APIERR_BADPOLY (Failed to modify slab geometry)")
 - ⬜ `ACAPI_Element_ChangeMore` – Modifies a number of elements in the current database.
 - ✅ `ACAPI_Element_ChangeMorphEdgeType` <sub>AC29–30</sub> – Modifies a morph element's edge type in the current database. — [#5](https://github.com/ENZYME-APD/tapir-archicad-automation/issues/5 "CreateMorphs/ModifyMorphs: on a hidden layer, misleading errors and a lost Morph")
 - ✅ `ACAPI_Element_ChangeParameters` – Changes the parameters of a number of elements.

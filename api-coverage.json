@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-01 15:56 UTC",
+ "generatedAt": "2026-11-03 10:53 UTC",
  "versions": [
   25,
   26,
@@ -6811,7 +6811,12 @@
    "status": "done",
    "reason": "",
    "pullRequests": [],
-   "issues": []
+   "issues": [
+    {
+     "number": 8,
+     "title": "ModifySlabs: polygonOutline that drops many nodes fails APIERR_BADPOLY (Failed to modify slab geometry)"
+    }
+   ]
   },
   {
    "id": "ACAPI_Element_ChangeMore",
