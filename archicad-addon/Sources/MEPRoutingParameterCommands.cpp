@@ -6,6 +6,7 @@
 #include "ACAPI/MEPTypes.hpp"
 #include "ACAPI/MEPEnums.hpp"
 #include "ACAPI/MEPRoutingElement.hpp"
+#include "ACAPI/MEPRoutingElementDefault.hpp"
 #include "ACAPI/MEPRoutingSegment.hpp"
 #include "ACAPI/MEPRoutingNode.hpp"
 #include "ACAPI/MEPRoutingSegmentDefault.hpp"
@@ -456,8 +457,43 @@ static void SetTablesOnSegmentsAndNodes (const RoutingElement& routingElement, c
 #endif
 }
 
-// Picks up the settings of each segment and node, changes the tables in them and injects them back, as
-// Archicad's pick up and inject parameters does.
+#ifdef ServerMainVers_2900
+// Picks up the settings of a node, changes the tables in them and injects them back, as Archicad's pick
+// up and inject parameters does.
+static void InjectTablesIntoNode (const ACAPI::MEP::UniqueID& nodeId, const RoutingTableChanges& tables, GS::Array<GS::UniString>& notes)
+{
+    if (!tables.elbow.has_value () && !tables.transition.has_value ()) {
+        return;
+    }
+    ACAPI::Result<RoutingNode> node = RoutingNode::Get (nodeId);
+    if (node.IsErr ()) {
+        return;
+    }
+    RoutingNodeDefault nodeDefault = node->PickUpDefault ();
+    ElbowDefault elbowDefault = nodeDefault.GetElbowDefault ();
+    TransitionDefault transitionDefault = nodeDefault.GetTransitionDefault ();
+    std::optional<GS::UniString> error;
+    if (tables.elbow.has_value ()) {
+        error = ApplyElbowChanges (elbowDefault, ElbowChanges { std::nullopt, tables.elbow });
+    }
+    if (!error.has_value ()) {
+        error = ApplyTransitionTableChange (transitionDefault, tables.transition);
+    }
+    CheckRoutingParameterSetter (nodeDefault.Modify ([&](RoutingNodeDefault::Modifier& modifier) {
+        modifier.SetElbowDefault (elbowDefault);
+        modifier.SetTransitionDefault (transitionDefault);
+    }), "the picked up node settings", error);
+    ACAPI::Result<void> result = node->Modify ([&](RoutingNode::Modifier& modifier) {
+        CheckRoutingParameterSetter (modifier.Inject (nodeDefault), "the picked up node settings", error);
+    }, "Inject Routing Parameters into Routing Node");
+    CheckRoutingParameterSetter (result, "the routing node", error);
+    if (error.has_value ()) {
+        notes.Push ("node inject: " + error.value ());
+    }
+}
+#endif
+
+// Picks up the settings of each segment and node, changes the tables in them and injects them back.
 static void InjectTablesIntoSegmentsAndNodes (const RoutingElement& routingElement, const RoutingSegmentChanges& segmentChanges, const RoutingTableChanges& tables, GS::Array<GS::UniString>& notes)
 {
     if (!segmentChanges.IsEmpty ()) {
@@ -478,37 +514,32 @@ static void InjectTablesIntoSegmentsAndNodes (const RoutingElement& routingEleme
         }
     }
 #ifdef ServerMainVers_2900
-    if (!tables.elbow.has_value () && !tables.transition.has_value ()) {
-        return;
-    }
     for (const ACAPI::MEP::UniqueID& nodeId : routingElement.GetRoutingNodeIds ()) {
-        ACAPI::Result<RoutingNode> node = RoutingNode::Get (nodeId);
-        if (node.IsErr ()) {
-            continue;
-        }
-        RoutingNodeDefault nodeDefault = node->PickUpDefault ();
-        ElbowDefault elbowDefault = nodeDefault.GetElbowDefault ();
-        TransitionDefault transitionDefault = nodeDefault.GetTransitionDefault ();
-        std::optional<GS::UniString> error;
-        if (tables.elbow.has_value ()) {
-            error = ApplyElbowChanges (elbowDefault, ElbowChanges { std::nullopt, tables.elbow });
-        }
-        if (!error.has_value ()) {
-            error = ApplyTransitionTableChange (transitionDefault, tables.transition);
-        }
-        CheckRoutingParameterSetter (nodeDefault.Modify ([&](RoutingNodeDefault::Modifier& modifier) {
-            modifier.SetElbowDefault (elbowDefault);
-            modifier.SetTransitionDefault (transitionDefault);
-        }), "the picked up node settings", error);
-        ACAPI::Result<void> result = node->Modify ([&](RoutingNode::Modifier& modifier) {
-            CheckRoutingParameterSetter (modifier.Inject (nodeDefault), "the picked up node settings", error);
-        }, "Inject Routing Parameters into Routing Node");
-        CheckRoutingParameterSetter (result, "the routing node", error);
-        if (error.has_value ()) {
-            notes.Push ("node inject: " + error.value ());
-        }
+        InjectTablesIntoNode (nodeId, tables, notes);
     }
+#else
+    (void) tables;
 #endif
+}
+
+// Picks up the settings of the whole route, puts the changed defaults in them and injects them back.
+static void InjectTablesIntoRoute (RoutingElement& routingElement, const RoutingSegmentDefault& segmentDefault, const RoutingNodeDefault& nodeDefault, GS::Array<GS::UniString>& notes)
+{
+    RoutingElementDefault routeDefault = routingElement.PickUpDefault ();
+    std::optional<GS::UniString> error;
+    CheckRoutingParameterSetter (routeDefault.Modify ([&](RoutingElementDefault::Modifier& modifier) {
+        modifier.SetRoutingSegmentDefault (segmentDefault);
+        modifier.SetRoutingNodeDefault (nodeDefault);
+    }), "the picked up route settings", error);
+    if (!error.has_value ()) {
+        ACAPI::Result<void> result = routingElement.Modify ([&](RoutingElement::Modifier& modifier) {
+            CheckRoutingParameterSetter (modifier.Inject (routeDefault), "the picked up route settings", error);
+        }, "Inject Routing Parameters into Routing Element");
+        CheckRoutingParameterSetter (result, "the routing element", error);
+    }
+    if (error.has_value ()) {
+        notes.Push ("route inject: " + error.value ());
+    }
 }
 
 static GS::UniString JoinRoutingParameterNotes (const GS::Array<GS::UniString>& notes)
@@ -598,20 +629,18 @@ static GS::ObjectState SetRoutingParametersOfRoutingElement (const ACAPI::MEP::U
     if (error.has_value ()) {
         return CreateFailedExecutionResult (APIERR_GENERAL, error.value ());
     }
-    if (tables.IsEmpty () || RouteUsesTables (*routingElement, tables)) {
+    if (tables.IsEmpty ()) {
         return CreateSuccessfulExecutionResult ();
     }
 
-    // The route's defaults did not reach its segments and nodes: set the tables on them, then inject them.
+    // Archicad reads the new tables back inside the command but keeps the old ones once it ends (fork
+    // issue #10), so the read-back cannot tell which way works: the tables are also set on each segment
+    // and node, and injected into them and into the route.
     GS::Array<GS::UniString> notes;
     SetTablesOnSegmentsAndNodes (*routingElement, segmentChanges, tables, notes);
-    if (RouteUsesTables (*routingElement, tables)) {
-        ACAPI_WriteReport ("SetMEPRoutingParameters: the tables reached the route through its segments and nodes.", false);
-        return CreateSuccessfulExecutionResult ();
-    }
     InjectTablesIntoSegmentsAndNodes (*routingElement, segmentChanges, tables, notes);
+    InjectTablesIntoRoute (*routingElement, segmentDefault, nodeDefault, notes);
     if (RouteUsesTables (*routingElement, tables)) {
-        ACAPI_WriteReport ("SetMEPRoutingParameters: the tables reached the route by injecting picked up settings.", false);
         return CreateSuccessfulExecutionResult ();
     }
     return CreateFailedExecutionResult (APIERR_GENERAL,
@@ -657,10 +686,16 @@ static GS::ObjectState SetRoutingParametersOfRoutingNode (const ACAPI::MEP::Uniq
     if (error.has_value ()) {
         return CreateFailedExecutionResult (APIERR_GENERAL, error.value ());
     }
-    if (tables.IsEmpty () || NodeUsesTables (elementId, tables)) {
+    if (tables.IsEmpty ()) {
         return CreateSuccessfulExecutionResult ();
     }
-    return CreateFailedExecutionResult (APIERR_GENERAL, "Archicad accepted the preference tables but the node kept its old tables.");
+    // As for a route (fork issue #10), the tables are also injected.
+    GS::Array<GS::UniString> notes;
+    InjectTablesIntoNode (elementId, tables, notes);
+    if (NodeUsesTables (elementId, tables)) {
+        return CreateSuccessfulExecutionResult ();
+    }
+    return CreateFailedExecutionResult (APIERR_GENERAL, "Archicad accepted the preference tables but the node kept its old tables, also when injected." + JoinRoutingParameterNotes (notes));
 }
 #endif
 

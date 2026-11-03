@@ -3887,9 +3887,9 @@ GS::ObjectState ModifyMEPPreferenceTablesCommand::Execute (const GS::ObjectState
     GS::Array<Int32> referenceIdsToDelete;
     const bool hasReferenceIdsToDelete = parameters.Get ("referenceIdsToDelete", referenceIdsToDelete);
     GS::Array<double> anglesToAdd;
-    const bool hasAnglesToAdd = parameters.Get ("anglesToAdd", anglesToAdd);
+    const bool hasAnglesToAdd = GetDoubleList (parameters, "anglesToAdd", anglesToAdd);
     GS::Array<double> anglesToDelete;
-    const bool hasAnglesToDelete = parameters.Get ("anglesToDelete", anglesToDelete);
+    const bool hasAnglesToDelete = GetDoubleList (parameters, "anglesToDelete", anglesToDelete);
     if (*domain == Domain::CableCarrier && (hasReferenceIdsToDelete || hasAnglesToAdd || hasAnglesToDelete)) {
         return CreateErrorResponse (APIERR_BADPARS, "The CableCarrier domain has no reference set or angle set.");
     }
