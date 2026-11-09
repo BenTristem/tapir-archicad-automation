@@ -1,11 +1,16 @@
 """Creates a beam, then changes its cross section and adds a round hole with ModifyBeams,
-moves it: a new reference line and its absolute elevation (zCoordinate, as in CreateBeams),
-and changes its floor plan display: home story only, cut contour pen 21 and dashed hidden lines.
+gives its segment its own top and bottom surfaces, moves it: a new reference line and its
+absolute elevation (zCoordinate, as in CreateBeams), and changes its floor plan display: home
+story only, cut contour pen 21 and dashed hidden lines.
 
-Only the given fields change; holes replaces every hole of the beam. The display settings
-have the names GetDetailsOfElements reads them under, so what it returns can be sent back.
+Only the given fields change; holes replaces every hole of the beam. segments writes the surfaces
+of the segment given by segmentIndex (0 for a beam of one segment), in the shape
+GetDetailsOfElements returns them. The display settings have the names GetDetailsOfElements
+reads them under, so what it returns can be sent back.
 """
 import aclib
+
+surfaces = aclib.RunTapirCommand ('GetAttributesByType', {'attributeType': 'Surface'})['attributes']
 
 beam = aclib.RunTapirCommand ('CreateBeams', {'beamsData': [{
     'begCoordinate': {'x': 0.0, 'y': 0.0},
@@ -19,6 +24,16 @@ aclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{
     'width': 0.3,
     'height': 0.6,
     'holes': [{'type': 'Circular', 'centerX': 3.0, 'centerZ': 0.3, 'width': 0.15}]
+}]}))
+
+aclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{
+    'elementId': beam['elementId'],
+    'segments': [{
+        'segmentIndex': 0,
+        'materialsChained': False,
+        'topMaterial': {'overridden': True, 'attributeId': surfaces[0]['attributeId']},
+        'bottomMaterial': {'overridden': True, 'attributeId': surfaces[1]['attributeId']}
+    }]
 }]}))
 
 aclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{
