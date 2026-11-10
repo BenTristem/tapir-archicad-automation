@@ -2874,6 +2874,23 @@ static bool IsFileOfOpenProject (const IO::Location& location)
         projectInfo.location->ToDisplayText ().Compare (location.ToDisplayText (), CaseInsensitive) == GS::UniString::Equal;
 }
 
+// Why a save in place failed, from the errors ACAPI_ProjectOperation_Save documents. The message
+// names the code too, because some clients show only an error's message.
+static GS::UniString DescribeSaveInPlaceFailure (GSErrCode err, bool floorPlanActive)
+{
+    switch (err) {
+        case APIERR_READONLY:
+            if (!floorPlanActive) {
+                return "Failed to save the project (APIERR_READONLY): the Floor Plan window could not be activated, and a save from another window, or with no window active, fails this way. Activate a Floor Plan window and try again. Otherwise the project is open read-only or has never been saved.";
+            }
+            return "Failed to save the project (APIERR_READONLY): it is open read-only (from an archive, or a file that is locked or open elsewhere) or has never been saved. Save it to a new file with projectPath.";
+        case APIERR_REFUSEDCMD:
+            return "Failed to save the project (APIERR_REFUSEDCMD): Archicad refused the command, as it does while another add-on command or an unfinished input such as a selection rectangle is running. Try again when Archicad is idle.";
+        default:
+            return GS::UniString::Printf ("Failed to save the project (error code %d).", err);
+    }
+}
+
 GS::ObjectState SaveProjectCommand::Execute (const GS::ObjectState& parameters, GS::ProcessControl& /*processControl*/) const
 {
     GS::UniString projectPath;
@@ -2891,7 +2908,7 @@ GS::ObjectState SaveProjectCommand::Execute (const GS::ObjectState& parameters, 
             fsp.file = &fileLoc;
             GSErrCode err = ACAPI_ProjectOperation_Save (&fsp);
             if (err != NoError) {
-                return CreateFailedExecutionResult (err, "Failed to save the project to the given path.");
+                return CreateFailedExecutionResult (err, GS::UniString::Printf ("Failed to save the project to the given path (error code %d).", err));
             }
             return CreateSuccessfulExecutionResult ();
         }
@@ -2915,23 +2932,30 @@ GS::ObjectState SaveProjectCommand::Execute (const GS::ObjectState& parameters, 
     // (a stale lock, another user editing it), where File > Save refuses -
     // and API_ProjectInfo has no read-only flag to check first. The plain save
     // keeps every one of those refusals, so it is the one to use.
+    //
+    // Archicad can also have no current window at all: just after a modal
+    // dialog (the Library Manager) closed, ACAPI_Window_GetCurrentWindow
+    // failed and the save failed with it, while File > Save worked moments
+    // later. So the Floor Plan is activated then too, with nothing to restore.
     API_WindowInfo previousWindow = {};
+    const bool previousWindowKnown = ACAPI_Window_GetCurrentWindow (&previousWindow) == NoError;
+    bool floorPlanActive = previousWindowKnown && previousWindow.typeID == APIWind_FloorPlanID;
     bool windowSwitched = false;
-    if (ACAPI_Window_GetCurrentWindow (&previousWindow) == NoError &&
-        previousWindow.typeID != APIWind_FloorPlanID) {
+    if (!floorPlanActive) {
         API_WindowInfo floorPlanWindow = {};
         floorPlanWindow.typeID = APIWind_FloorPlanID;
         windowSwitched = ACAPI_Window_ChangeWindow (&floorPlanWindow) == NoError;
+        floorPlanActive = windowSwitched;
     }
     const GS::OnExit restoreWindow ([&] () {
-        if (windowSwitched) {
+        if (windowSwitched && previousWindowKnown) {
             ACAPI_Window_ChangeWindow (&previousWindow);
         }
     });
 
     const GSErrCode err = ACAPI_ProjectOperation_Save ();
     if (err != NoError) {
-        return CreateFailedExecutionResult (err, "Failed to save the project.");
+        return CreateFailedExecutionResult (err, DescribeSaveInPlaceFailure (err, floorPlanActive));
     }
     return CreateSuccessfulExecutionResult ();
 }
