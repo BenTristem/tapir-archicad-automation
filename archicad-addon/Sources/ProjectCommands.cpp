@@ -2932,23 +2932,18 @@ GS::ObjectState SaveProjectCommand::Execute (const GS::ObjectState& parameters, 
     // (a stale lock, another user editing it), where File > Save refuses -
     // and API_ProjectInfo has no read-only flag to check first. The plain save
     // keeps every one of those refusals, so it is the one to use.
-    //
-    // Archicad can also have no current window at all: just after a modal
-    // dialog (the Library Manager) closed, ACAPI_Window_GetCurrentWindow
-    // failed and the save failed with it, while File > Save worked moments
-    // later. So the Floor Plan is activated then too, with nothing to restore.
     API_WindowInfo previousWindow = {};
     const bool previousWindowKnown = ACAPI_Window_GetCurrentWindow (&previousWindow) == NoError;
     bool floorPlanActive = previousWindowKnown && previousWindow.typeID == APIWind_FloorPlanID;
     bool windowSwitched = false;
-    if (!floorPlanActive) {
+    if (previousWindowKnown && !floorPlanActive) {
         API_WindowInfo floorPlanWindow = {};
         floorPlanWindow.typeID = APIWind_FloorPlanID;
         windowSwitched = ACAPI_Window_ChangeWindow (&floorPlanWindow) == NoError;
         floorPlanActive = windowSwitched;
     }
     const GS::OnExit restoreWindow ([&] () {
-        if (windowSwitched && previousWindowKnown) {
+        if (windowSwitched) {
             ACAPI_Window_ChangeWindow (&previousWindow);
         }
     });
