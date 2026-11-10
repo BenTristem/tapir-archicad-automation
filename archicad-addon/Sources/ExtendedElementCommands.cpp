@@ -1500,8 +1500,11 @@ GS::ObjectState ExecuteCreateWithElements (const GS::String& commandName, Func&&
 // command, and reports the modified elements to the notification clients (#1825): modifyFunc
 // pushes one result per item, in order, and the items with a successful result are reported
 // as changed, the others only when their modification stamp changed anyway.
-template<typename Func>
-GS::ObjectState ExecuteModifyWithResults (const GS::String& commandName, const GS::Array<GS::ObjectState>& items, Func&& modifyFunc)
+// verifyFunc runs after the undoable command has ended and may replace results: some values (a
+// railing's bottomOffset) are only updated in the database once the command is over, so reading
+// them back inside it gives the old value.
+template<typename Func, typename VerifyFunc>
+GS::ObjectState ExecuteModifyWithResults (const GS::String& commandName, const GS::Array<GS::ObjectState>& items, Func&& modifyFunc, VerifyFunc&& verifyFunc)
 {
     GS::Array<GS::ObjectState> results;
 
@@ -1512,6 +1515,7 @@ GS::ObjectState ExecuteModifyWithResults (const GS::String& commandName, const G
         modifyFunc (results);
         return NoError;
     });
+    verifyFunc (results);
 
     if (results.GetSize () == items.GetSize ()) {
         for (UIndex i = 0; i < items.GetSize (); ++i) {
@@ -1525,6 +1529,12 @@ GS::ObjectState ExecuteModifyWithResults (const GS::String& commandName, const G
     changeReporter.Report ();
 
     return CreateExecutionResultResponse (results);
+}
+
+template<typename Func>
+GS::ObjectState ExecuteModifyWithResults (const GS::String& commandName, const GS::Array<GS::ObjectState>& items, Func&& modifyFunc)
+{
+    return ExecuteModifyWithResults (commandName, items, std::forward<Func> (modifyFunc), [](GS::Array<GS::ObjectState>&) {});
 }
 
 }

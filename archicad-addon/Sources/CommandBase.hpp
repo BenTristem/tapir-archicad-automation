@@ -427,6 +427,11 @@ bool DoesElementExist (const API_Guid& elementGuid, API_ElemTypeID expectedTypeI
 // is shown and unlocked.
 GSErrCode GetLayerChangeError (const API_AttributeIndex& layer, GS::UniString& reason);
 
+// Reads the Element ID of an element, the "id" of GetDetailsOfElements: with
+// ACAPI_Element_GetElementInfoString, or the elemInfoString memo part when that fails.
+// Defined in CommandBase.cpp.
+GSErrCode GetElementId (const API_Guid& elementGuid, GS::UniString& id);
+
 // Writes the Element ID of an existing element: the elemInfoString memo part, which
 // GetDetailsOfElements reads back as "id" (APIMemoMask_ElemInfoString). Must be called
 // inside an undoable command. Defined in CommandBase.cpp.

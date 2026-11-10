@@ -1840,6 +1840,21 @@ void DecomposeHotlinkTransformation (const API_Tranmat& transformation, API_Coor
     mirrored = det < 0.0;
 }
 
+GSErrCode GetElementId (const API_Guid& elementGuid, GS::UniString& id)
+{
+    if (ACAPI_Element_GetElementInfoString (&elementGuid, &id) == NoError) {
+        return NoError;
+    }
+    API_ElementMemo memo = {};
+    const GS::OnExit guard ([&memo] () { ACAPI_DisposeElemMemoHdls (&memo); });
+    const GSErrCode err = ACAPI_Element_GetMemo (elementGuid, &memo, APIMemoMask_ElemInfoString);
+    if (err != NoError) {
+        return err;
+    }
+    id = memo.elemInfoString != nullptr ? *memo.elemInfoString : GS::EmptyUniString;
+    return NoError;
+}
+
 GSErrCode ChangeElementId (const API_Guid& elementGuid, const GS::UniString& id)
 {
     // Only the info string part of the memo is filled and masked, so nothing else of the
