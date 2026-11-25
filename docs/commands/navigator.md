@@ -599,7 +599,7 @@ Example: [archicad-addon/Examples/Navigator/SetViewOptions.py](https://github.co
 
 ### GetViewSettings
 
-Gets the view settings of navigator items
+Gets the view settings of navigator items, including a view's own (custom) layer states
 
 Group: Navigator Commands. Added in Tapir 1.1.4. Docs: https://archicad-api.com/archicad-addon/#GetViewSettings
 
@@ -617,7 +617,7 @@ Example: [archicad-addon/Examples/Navigator/GetViewSettings.py](https://github.c
 
 ### SetViewSettings
 
-Sets the view settings of navigator items
+Sets the view settings of navigator items, including a view's own (custom) layer states
 
 Group: Navigator Commands. Added in Tapir 1.1.4. Docs: https://archicad-api.com/archicad-addon/#SetViewSettings
 
@@ -2218,6 +2218,7 @@ object: The identifier of a database
 object: The settings of a navigator view
 - `modelViewOptions` (string): The name of the model view options. If empty, the view has custom model view options.
 - `layerCombination` (string): The name of the layer combination. If empty, the view has custom layer combination.
+- `customLayers` (array of ViewLayerState): The view's own layer settings (Archicad 27 and later): the layer states the view stores when it stores its layers (saveFlags.layers) under no layer combination name, as the View Settings dialog's "Get Current Window's Settings" stores them. GetViewSettings returns every layer of the set, ordered by layer index, and omits the field when the view stores no custom layers. SetViewSettings changes only the fields given of the layers listed; the other layers and fields keep what the view shows now (its custom layers, else its layer combination's states, else the layers' current states). It turns saveFlags.layers on and clears the layerCombination name, so it can't be given with a layerCombination name or with saveFlags.layers false. The view is read back, and a layer state Archicad did not keep fails the item.
 - `dimensionStyle` (string): The name of the dimension style (a dimension standard of Options > Project Preferences > Dimensions, as GetDimensionStandards lists them). If empty, the view has custom dimension style. GetViewSettings returns the name the view stores as it is: Archicad does not check it against the project's dimension standards, so it can name one that GetDimensionStandards does not list, e.g. a standard that was renamed or deleted after the view was saved. It is valid data only when saveFlags.dimensions is true; otherwise the view does not store dimension settings and the name may be a leftover. Use FindDimensionStandard to tell whether the name exists in the project (it fails when it does not).
 - `penSetName` (string): The name of the pen set. If empty, the view has custom pen set.
 - `graphicOverrideCombination` (string): The name of the graphic override combination. If empty, the view has custom graphic override combination.
@@ -2244,6 +2245,15 @@ object: The settings of a navigator view
 - `d3styleName` (string): Name of the 3D style. Empty if not set.
 - `renderingSceneName` (string): Name of the rendering scene. Empty if not set.
 - `usePhotoRendering` (boolean): Whether photo rendering is used for this view.
+
+### ViewLayerState
+
+object: The state of one layer in a view's own (custom) layer settings. GetViewSettings returns every field; in SetViewSettings a field that is not given keeps its current value.
+- `attributeId` (AttributeId, required): The identifier of the Layer attribute.
+- `isHidden` (boolean): Whether the layer is hidden in the view.
+- `isLocked` (boolean): Whether the layer is locked in the view.
+- `isWireframe` (boolean): Whether the layer's elements are forced to wireframe in the view's 3D.
+- `intersectionGroupNr` (integer): Intersection group of the layer in the view. Elements on layers having the same group will be intersected.
 
 ### ViewSettingsOrError
 

@@ -85,45 +85,6 @@ static GS::Optional<GS::ObjectState> GetAttributeIdFromIndex (API_AttrTypeID att
     return CreateAttributeIdObjectState (attribute.header.guid);
 }
 
-static bool GetAttributeIndexFromAttributeId (const GS::ObjectState& attributeId, API_AttrTypeID attributeType, API_AttributeIndex& attributeIndex)
-{
-    const API_Guid requestedGuid = GetGuidFromAttributesArrayItem (attributeId);
-    if (requestedGuid == APINULLGuid) {
-        return false;
-    }
-    API_Attribute attribute = {};
-    attribute.header.guid = requestedGuid;
-    attribute.header.typeID = attributeType;
-    if (ACAPI_Attribute_Get (&attribute) != NoError) {
-        return false;
-    }
-    DisposeAttribute (attribute);
-
-    // Archicad finds an attribute by its guid whatever type is asked for, so a layer's guid given as a
-    // Fill would give the layer's index, which is some other fill. Read the attribute of the asked type
-    // at that index back and accept it only when it is the same attribute. A guid the Get came back with
-    // that is not the one asked for is another attribute too (a Surface's guid given as a Building
-    // Material was accepted in AC28, #2585).
-    const API_Guid guid = attribute.header.guid;
-    const API_AttributeIndex index = attribute.header.index;
-    if (guid != requestedGuid || attribute.header.typeID != attributeType) {
-        return false;
-    }
-    API_Attribute check = {};
-    check.header.typeID = attributeType;
-    check.header.index = index;
-    if (ACAPI_Attribute_Get (&check) != NoError) {
-        return false;
-    }
-    DisposeAttribute (check);
-    if (check.header.guid != guid) {
-        return false;
-    }
-
-    attributeIndex = index;
-    return true;
-}
-
 // API_Attr_Head::name is the legacy 8-bit name: non-ASCII characters come back garbled from it and the
 // built-in Archicad Layer only has a control character there. Archicad hands out the real Unicode name
 // through header.uniStringNamePtr, but only when it points at storage before the Get call, so an

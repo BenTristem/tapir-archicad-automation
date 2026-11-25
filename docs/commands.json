@@ -5511,7 +5511,7 @@
    "name": "GetViewSettings",
    "group": "Navigator Commands",
    "version": "1.1.4",
-   "description": "Gets the view settings of navigator items",
+   "description": "Gets the view settings of navigator items, including a view's own (custom) layer states",
    "groupFile": "https://archicad-api.com/commands/navigator.json",
    "groupMarkdown": "https://archicad-api.com/commands/navigator.md",
    "docsUrl": "https://archicad-api.com/archicad-addon/#GetViewSettings"
@@ -5520,7 +5520,7 @@
    "name": "SetViewSettings",
    "group": "Navigator Commands",
    "version": "1.1.4",
-   "description": "Sets the view settings of navigator items",
+   "description": "Sets the view settings of navigator items, including a view's own (custom) layer states",
    "groupFile": "https://archicad-api.com/commands/navigator.json",
    "groupMarkdown": "https://archicad-api.com/commands/navigator.md",
    "docsUrl": "https://archicad-api.com/archicad-addon/#SetViewSettings"

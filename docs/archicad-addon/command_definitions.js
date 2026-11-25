@@ -32235,7 +32235,7 @@ var gCommands = [{
             },{
                 "name": "GetViewSettings",
                 "version": "1.1.4",
-                "description": "Gets the view settings of navigator items",
+                "description": "Gets the view settings of navigator items, including a view's own (custom) layer states",
                 "inputScheme": {
         "type": "object",
         "properties": {
@@ -32266,7 +32266,7 @@ var gCommands = [{
             },{
                 "name": "SetViewSettings",
                 "version": "1.1.4",
-                "description": "Sets the view settings of navigator items",
+                "description": "Sets the view settings of navigator items, including a view's own (custom) layer states",
                 "inputScheme": {
         "type": "object",
         "properties": {

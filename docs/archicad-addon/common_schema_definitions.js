@@ -10121,6 +10121,13 @@ var gSchemaDefinitions = {
                 "type": "string",
                 "description": "The name of the layer combination. If empty, the view has custom layer combination."
             },
+            "customLayers": {
+                "type": "array",
+                "description": "The view's own layer settings (Archicad 27 and later): the layer states the view stores when it stores its layers (saveFlags.layers) under no layer combination name, as the View Settings dialog's \"Get Current Window's Settings\" stores them. GetViewSettings returns every layer of the set, ordered by layer index, and omits the field when the view stores no custom layers. SetViewSettings changes only the fields given of the layers listed; the other layers and fields keep what the view shows now (its custom layers, else its layer combination's states, else the layers' current states). It turns saveFlags.layers on and clears the layerCombination name, so it can't be given with a layerCombination name or with saveFlags.layers false. The view is read back, and a layer state Archicad did not keep fails the item.",
+                "items": {
+                    "$ref": "#/ViewLayerState"
+                }
+            },
             "dimensionStyle": {
                 "type": "string",
                 "description": "The name of the dimension style (a dimension standard of Options > Project Preferences > Dimensions, as GetDimensionStandards lists them). If empty, the view has custom dimension style. GetViewSettings returns the name the view stores as it is: Archicad does not check it against the project's dimension standards, so it can name one that GetDimensionStandards does not list, e.g. a standard that was renamed or deleted after the view was saved. It is valid data only when saveFlags.dimensions is true; otherwise the view does not store dimension settings and the name may be a leftover. Use FindDimensionStandard to tell whether the name exists in the project (it fails when it does not)."
@@ -10236,6 +10243,36 @@ var gSchemaDefinitions = {
         },
         "additionalProperties": false,
         "required": []
+    },
+    "ViewLayerState": {
+        "type": "object",
+        "description": "The state of one layer in a view's own (custom) layer settings. GetViewSettings returns every field; in SetViewSettings a field that is not given keeps its current value.",
+        "properties": {
+            "attributeId": {
+                "description": "The identifier of the Layer attribute.",
+                "$ref": "#/AttributeId"
+            },
+            "isHidden": {
+                "type": "boolean",
+                "description": "Whether the layer is hidden in the view."
+            },
+            "isLocked": {
+                "type": "boolean",
+                "description": "Whether the layer is locked in the view."
+            },
+            "isWireframe": {
+                "type": "boolean",
+                "description": "Whether the layer's elements are forced to wireframe in the view's 3D."
+            },
+            "intersectionGroupNr": {
+                "type": "integer",
+                "description": "Intersection group of the layer in the view. Elements on layers having the same group will be intersected."
+            }
+        },
+        "additionalProperties": false,
+        "required": [
+            "attributeId"
+        ]
     },
     "ViewSettingsOrError": {
         "type": "object",

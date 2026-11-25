@@ -698,8 +698,8 @@ Parameters, results and examples: [commands/navigator.md](https://archicad-api.c
 - **GetModelViewOptionDetails** (since 2.0.0): Gets the settings stored in model view option combinations (Document > Model View > Model View Options), all of them or the ones given by id or by name: the model view options in the fields of GetViewOptions, and the options library parts add to the combination (gdlOptions) with their GDL parameter values.
 - **GetViewOptions** (since 1.8.0): Gets the model view options and on-screen view options of the current plan window, and the index and name of the model view option combination it applies.
 - **SetViewOptions** (since 1.8.0): Switches the current plan window to a model view option combination by index, and/or changes the given model view options and on-screen view options.
-- **GetViewSettings** (since 1.1.4): Gets the view settings of navigator items
-- **SetViewSettings** (since 1.1.4): Sets the view settings of navigator items
+- **GetViewSettings** (since 1.1.4): Gets the view settings of navigator items, including a view's own (custom) layer states
+- **SetViewSettings** (since 1.1.4): Sets the view settings of navigator items, including a view's own (custom) layer states
 - **GetActiveGraphicalOverrideCombination** (since 1.7.2): Gets the graphic override combination applied to the current window, with its id and name.
 - **SetActiveGraphicalOverrideCombination** (since 1.7.2): Applies a graphic override combination, given by id or by name, to the current window.
 - **GetRenovationFilters** (since 1.8.0): Gets the renovation filters of the project, and the one the current window uses (Document > Renovation > Renovation Filter).
