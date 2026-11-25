@@ -11869,13 +11869,13 @@
    "name": "DeleteElements",
    "group": "Element Commands",
    "version": "1.2.1",
-   "description": "Deletes elements, each in the database that contains it (the floor plan, a section, a worksheet, a layout, ...), whichever window is the current one; the current window stays. The zones of the call are deleted before all the other elements, so an automatic zone deleted together with its bounding walls is gone before its boundary is; deleting the boundary of an automatic zone without the zone itself can open Archicad's modal 'No closed polygon found' dialog, which blocks the command until someone clicks it in Archicad. Returns an execution result for each input element: an element that could not be deleted (for example because its layer is locked) or a guid that is not in the project gets a failed execution result instead of being skipped silently, and does not stop the other elements from being deleted. With dryRun true nothing is deleted and no undo step is created: the response has dryRun set to true, and each element that passes the checks made before deleting gets wouldDelete, so a script can preview a deletion before making it.",
+   "description": "Deletes elements. The zones of the call are deleted before all the other elements, so an automatic zone deleted together with its bounding walls is gone before its boundary is; deleting the boundary of an automatic zone without the zone itself can open Archicad's modal 'No closed polygon found' dialog, which blocks the command until someone clicks it in Archicad. Returns an execution result for each input element: an element that could not be deleted (for example because its layer is locked) or a guid that is not in the project gets a failed execution result instead of being skipped silently, and does not stop the other elements from being deleted. With dryRun true nothing is deleted and no undo step is created: the response has dryRun set to true, and each element that passes the checks made before deleting gets wouldDelete, so a script can preview a deletion before making it.",
    "inputSchema": {
     "type": "object",
     "properties": {
      "elements": {
       "$ref": "#/Elements",
-      "description": "The elements to delete, of any database (the floor plan, a section, a worksheet, a layout, ...): each is deleted in the database that contains it, whichever window is the current one, and the current window stays. The zones among them are deleted before all the others, so an automatic zone deleted together with its bounding elements is gone before its boundary is. Deleting the boundary of an automatic zone without the zone itself can open Archicad's modal 'No closed polygon found around the clicked point' dialog, which blocks the command until someone clicks it in Archicad."
+      "description": "The elements to delete. The zones among them are deleted before all the others, so an automatic zone deleted together with its bounding elements is gone before its boundary is. Deleting the boundary of an automatic zone without the zone itself can open Archicad's modal 'No closed polygon found around the clicked point' dialog, which blocks the command until someone clicks it in Archicad."
      },
      "dryRun": {
       "$ref": "#/DryRun"
@@ -13293,7 +13293,7 @@
    "name": "CreateBeams",
    "group": "Element Commands",
    "version": "1.4.0",
-   "description": "Creates Beam elements based on the given parameters. Takes the same cut fill pens, cover fill and holes as ModifyBeams, besides the position, shape, slant and cross section; settings not given come from the Beam tool defaults or the favorite. Both commands take the same segments array, which sets the cross section, taper, length and surfaces of single segments. Not written by either command: the cut fill pens before Archicad 27.",
+   "description": "Creates Beam elements based on the given parameters. Takes the same cut fill pens, cover fill and holes as ModifyBeams, besides the position, shape, slant and cross section; settings not given come from the Beam tool defaults or the favorite. Both commands take the same segments array, which sets the cross section, taper and length of single segments. Not written by either command: the surfaces of the beam segments, and the cut fill pens before Archicad 27.",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -13391,7 +13391,7 @@
         },
         "segments": {
          "type": "array",
-         "description": "Optional changes to single segments of the new beam, which has the segments of the Beam tool defaults or the favorite, or segmentCount segments: their cross section, taper, length and surfaces. Applied after segmentCount and the cross section given for all segments, so a segment given here keeps its own values. A segmentIndex the beam does not have is an error and the beam is not created.",
+         "description": "Optional changes to single segments of the new beam, which has the segments of the Beam tool defaults or the favorite, or segmentCount segments: their cross section, taper and length. Applied after segmentCount and the cross section given for all segments, so a segment given here keeps its own values. A segmentIndex the beam does not have is an error and the beam is not created.",
          "items": {
           "$ref": "#/BeamSegmentModification"
          }
@@ -21147,7 +21147,7 @@
    "name": "ModifyBeams",
    "group": "Element Commands",
    "version": "1.4.0",
-   "description": "Modifies Beam elements based on the given parameters. CreateBeams takes the same cut fill pens, cover fill and holes, and the same absolute zCoordinate of the reference line (with an optional floorIndex), and the same segments array, which changes the cross section, taper, length and the left, top, right, bottom, ends and extrusion surfaces of single segments (the surfaces in the shape GetDetailsOfElements returns them) and leaves the others as they are. Also writes the floor plan display settings GetDetailsOfElements reads, under the same names: story visibility, display option, view depth, uncut and overhead projection modes, whether the contour lines and the reference axis are shown, and the pens and line types of the cut contour, uncut, overhead, hidden and reference lines; each is read back after the change, and one Archicad did not take fails the item. Not written: the cut fill pens before Archicad 27.",
+   "description": "Modifies Beam elements based on the given parameters. CreateBeams takes the same cut fill pens, cover fill and holes, and the same absolute zCoordinate of the reference line (with an optional floorIndex), and the same segments array, which changes the cross section, taper and length of single segments and leaves the others as they are. Also writes the floor plan display settings GetDetailsOfElements reads, under the same names: story visibility, display option, view depth, uncut and overhead projection modes, whether the contour lines and the reference axis are shown, and the pens and line types of the cut contour, uncut, overhead, hidden and reference lines; each is read back after the change, and one Archicad did not take fails the item. Not written: the surfaces of the beam segments, and the cut fill pens before Archicad 27.",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -21244,7 +21244,7 @@
         },
         "segments": {
          "type": "array",
-         "description": "Optional changes to single segments of the beam: their cross section, taper, length and surfaces. Only the segments and keys given change, so the neighbouring segments stay as they are. Applied after the cross section given for all segments. Segments are not added or removed; a segmentIndex the beam does not have, or a wrong surface, fails the item before anything of it is written.",
+         "description": "Optional changes to single segments of the beam: their cross section, taper and length. Only the segments and keys given change, so the neighbouring segments stay as they are. Applied after the cross section given for all segments. Segments are not added or removed; a segmentIndex the beam does not have fails the item before anything of it is written.",
          "items": {
           "$ref": "#/BeamSegmentModification"
          }
@@ -21373,8 +21373,8 @@
    "example": {
     "path": "archicad-addon/Examples/Element/ModifyBeams.py",
     "url": "https://github.com/ENZYME-APD/tapir-archicad-automation/blob/main/archicad-addon/Examples/Element/ModifyBeams.py",
-    "description": "Creates a beam, then changes its cross section and adds a round hole with ModifyBeams, gives its segment its own top and bottom surfaces, moves it: a new reference line and its absolute elevation (zCoordinate, as in CreateBeams), changes its floor plan display: home story only, cut contour pen 21 and dashed hidden lines, and tapers one segment of the beam with segments. Only the given fields change; holes replaces every hole of the beam. segments changes single segments, chosen by segmentIndex (0 for a beam of one segment): their surfaces, in the shape GetDetailsOfElements returns them, and, last, the taper of one segment. The display settings have the names GetDetailsOfElements reads them under, so what it returns can be sent back.",
-    "code": "\"\"\"Creates a beam, then changes its cross section and adds a round hole with ModifyBeams,\ngives its segment its own top and bottom surfaces, moves it: a new reference line and its\nabsolute elevation (zCoordinate, as in CreateBeams), changes its floor plan display: home story\nonly, cut contour pen 21 and dashed hidden lines, and tapers one segment of the beam with segments.\n\nOnly the given fields change; holes replaces every hole of the beam. segments changes single\nsegments, chosen by segmentIndex (0 for a beam of one segment): their surfaces, in the shape\nGetDetailsOfElements returns them, and, last, the taper of one segment. The display settings\nhave the names GetDetailsOfElements reads them under, so what it returns can be sent back.\n\"\"\"\nimport aclib\n\nsurfaces = aclib.RunTapirCommand ('GetAttributesByType', {'attributeType': 'Surface'})['attributes']\n\nbeam = aclib.RunTapirCommand ('CreateBeams', {'beamsData': [{\n    'begCoordinate': {'x': 0.0, 'y': 0.0},\n    'endCoordinate': {'x': 6.0, 'y': 0.0},\n    'zCoordinate': 3.0\n}]})['elements'][0]\n\naclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{\n    'elementId': beam['elementId'],\n    'isWidthAndHeightLinked': False,\n    'width': 0.3,\n    'height': 0.6,\n    'holes': [{'type': 'Circular', 'centerX': 3.0, 'centerZ': 0.3, 'width': 0.15}]\n}]}))\n\naclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{\n    'elementId': beam['elementId'],\n    'segments': [{\n        'segmentIndex': 0,\n        'materialsChained': False,\n        'topMaterial': {'overridden': True, 'attributeId': surfaces[0]['attributeId']},\n        'bottomMaterial': {'overridden': True, 'attributeId': surfaces[1]['attributeId']}\n    }]\n}]}))\n\naclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{\n    'elementId': beam['elementId'],\n    'begCoordinate': {'x': 1.0, 'y': 2.0},\n    'endCoordinate': {'x': 7.0, 'y': 2.0},\n    'zCoordinate': 2.5\n}]}))\n\nlineTypes = aclib.RunTapirCommand ('GetAttributesByType', {'attributeType': 'Line'})['attributes']\ndashed = next ((a for a in lineTypes if 'dash' in a.get ('name', '').lower ()), lineTypes[-1])\n\naclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{\n    'elementId': beam['elementId'],\n    'isAutoOnStoryVisibility': False,\n    'visibility': {'showOnHome': True, 'showAllAbove': False, 'showAllBelow': False, 'showRelAbove': 0, 'showRelBelow': 0},\n    'cutContourLinePen': 21,\n    'hiddenLinePen': 21,\n    'hiddenLineTypeId': dashed['attributeId']\n}]}))\n\n# segments changes single segments, picked by segmentIndex: here the first one is tapered to\n# half its height at its end. The other segments of a multi-segment beam stay as they are\n# (see Workflows/change_one_beam_segment.py).\naclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{\n    'elementId': beam['elementId'],\n    'segments': [{\n        'segmentIndex': 0,\n        'geometry': {'isHomogeneous': False, 'isEndWidthAndHeightLinked': False, 'endWidth': 0.3, 'endHeight': 0.3}\n    }]\n}]}))\naclib.RunTapirCommand ('GetDetailsOfElements', {'elements': [beam], 'fields': ['details']})\n"
+    "description": "Creates a beam, then changes its cross section and adds a round hole with ModifyBeams, moves it: a new reference line and its absolute elevation (zCoordinate, as in CreateBeams), changes its floor plan display: home story only, cut contour pen 21 and dashed hidden lines, and tapers one segment of the beam with segments. Only the given fields change; holes replaces every hole of the beam. The display settings have the names GetDetailsOfElements reads them under, so what it returns can be sent back.",
+    "code": "\"\"\"Creates a beam, then changes its cross section and adds a round hole with ModifyBeams,\nmoves it: a new reference line and its absolute elevation (zCoordinate, as in CreateBeams),\nchanges its floor plan display: home story only, cut contour pen 21 and dashed hidden lines,\nand tapers one segment of the beam with segments.\n\nOnly the given fields change; holes replaces every hole of the beam. The display settings\nhave the names GetDetailsOfElements reads them under, so what it returns can be sent back.\n\"\"\"\nimport aclib\n\nbeam = aclib.RunTapirCommand ('CreateBeams', {'beamsData': [{\n    'begCoordinate': {'x': 0.0, 'y': 0.0},\n    'endCoordinate': {'x': 6.0, 'y': 0.0},\n    'zCoordinate': 3.0\n}]})['elements'][0]\n\naclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{\n    'elementId': beam['elementId'],\n    'isWidthAndHeightLinked': False,\n    'width': 0.3,\n    'height': 0.6,\n    'holes': [{'type': 'Circular', 'centerX': 3.0, 'centerZ': 0.3, 'width': 0.15}]\n}]}))\n\naclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{\n    'elementId': beam['elementId'],\n    'begCoordinate': {'x': 1.0, 'y': 2.0},\n    'endCoordinate': {'x': 7.0, 'y': 2.0},\n    'zCoordinate': 2.5\n}]}))\n\nlineTypes = aclib.RunTapirCommand ('GetAttributesByType', {'attributeType': 'Line'})['attributes']\ndashed = next ((a for a in lineTypes if 'dash' in a.get ('name', '').lower ()), lineTypes[-1])\n\naclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{\n    'elementId': beam['elementId'],\n    'isAutoOnStoryVisibility': False,\n    'visibility': {'showOnHome': True, 'showAllAbove': False, 'showAllBelow': False, 'showRelAbove': 0, 'showRelBelow': 0},\n    'cutContourLinePen': 21,\n    'hiddenLinePen': 21,\n    'hiddenLineTypeId': dashed['attributeId']\n}]}))\n\n# segments changes single segments, picked by segmentIndex: here the first one is tapered to\n# half its height at its end. The other segments of a multi-segment beam stay as they are\n# (see Workflows/change_one_beam_segment.py).\naclib.PrintJson (aclib.RunTapirCommand ('ModifyBeams', {'beamsWithDetails': [{\n    'elementId': beam['elementId'],\n    'segments': [{\n        'segmentIndex': 0,\n        'geometry': {'isHomogeneous': False, 'isEndWidthAndHeightLinked': False, 'endWidth': 0.3, 'endHeight': 0.3}\n    }]\n}]}))\naclib.RunTapirCommand ('GetDetailsOfElements', {'elements': [beam], 'fields': ['details']})\n"
    },
    "docsUrl": "https://archicad-api.com/archicad-addon/#ModifyBeams"
   },
@@ -35270,7 +35270,7 @@
     "properties": {
      "ruleGroupNames": {
       "type": "array",
-      "description": "The names of the rule groups in their new order. The groups not listed keep their order and follow the listed ones. Built-in groups, like the Renovation group, cannot be listed and keep their place.",
+      "description": "The names of the rule groups in their new order. The groups not listed keep their order and follow the listed ones.",
       "items": {
        "type": "string"
       },
@@ -37721,7 +37721,7 @@
    "name": "SetLibraryPartScripts",
    "group": "Library Commands",
    "version": "1.7.3",
-   "description": "Sets and deletes the master, parameter, 2D, 3D, properties, interface and forward and backward migration scripts of loaded library parts. Only the given scripts are changed; an empty script makes the section empty, deleteScripts removes it. A library part that is not editable (e.g. a part of a library package or a read-only library) is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.",
+   "description": "Sets and deletes the master, parameter, 2D, 3D, properties, interface and forward and backward migration scripts of loaded library parts. Only the given scripts are changed; an empty script makes the section empty, deleteScripts removes it. A library part that is not editable (e.g. a part of a library package or a read-only library) is refused and left unchanged. Available from Archicad 28.",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -37765,7 +37765,7 @@
    "name": "SetLibraryPartMetadata",
    "group": "Library Commands",
    "version": "1.8.0",
-   "description": "Sets the author, keywords, license, license version, password and the placeable, UI default, subtype and hierarchical pages flags of loaded library parts. Only the given fields are changed. A library part that is not editable (e.g. a part of a library package or a read-only library) is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.",
+   "description": "Sets the author, keywords, license, license version, password and the placeable, UI default, subtype and hierarchical pages flags of loaded library parts. Only the given fields are changed. A library part that is not editable (e.g. a part of a library package or a read-only library) is refused and left unchanged. Available from Archicad 28.",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -37869,7 +37869,7 @@
    "name": "SetLibraryPartPictures",
    "group": "Library Commands",
    "version": "1.8.0",
-   "description": "Deletes the preview picture, the GDL pictures (and from Archicad 29 their dark variants) or the 2D symbol of a loaded library part, or copies the 2D symbol from another library part. A library part that is not editable is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.",
+   "description": "Deletes the preview picture, the GDL pictures (and from Archicad 29 their dark variants) or the 2D symbol of a loaded library part, or copies the 2D symbol from another library part. A library part that is not editable is refused and left unchanged. Available from Archicad 28.",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -37988,7 +37988,7 @@
    "name": "SetLibraryPartCustomSection",
    "group": "Library Commands",
    "version": "1.8.0",
-   "description": "Creates, replaces or deletes a custom section of a loaded library part. The content is given as base64. A library part that is not editable is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.",
+   "description": "Creates, replaces or deletes a custom section of a loaded library part. The content is given as base64. A library part that is not editable is refused and left unchanged. Available from Archicad 28.",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -38393,7 +38393,7 @@
    "name": "SetLibraryPartPictureImages",
    "group": "Library Commands",
    "version": "2.0.0",
-   "description": "Sets the preview picture and the GDL pictures of a loaded library part from base64 encoded PNGs, and from Archicad 29 also their dark user interface variants. All pictures are set in one step; an invalid picture changes nothing. A library part that is not editable is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.",
+   "description": "Sets the preview picture and the GDL pictures of a loaded library part from base64 encoded PNGs, and from Archicad 29 also their dark user interface variants. All pictures are set in one step; an invalid picture changes nothing. A library part that is not editable is refused and left unchanged. Available from Archicad 28.",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -38449,7 +38449,7 @@
    "name": "SetLibraryPartParameters",
    "group": "Library Commands",
    "version": "2.0.0",
-   "description": "Sets the parameter values, and optionally the parameter descriptions, of loaded library parts, in the format of SetGDLParametersOfElements. Only the given parameters are changed; with merge, the changed list is merged into the parameters of the part instead of replacing them. A library part that is not editable, or with an invalid value given, is left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.",
+   "description": "Sets the parameter values, and optionally the parameter descriptions, of loaded library parts, in the format of SetGDLParametersOfElements. Only the given parameters are changed; with merge, the changed list is merged into the parameters of the part instead of replacing them. A library part that is not editable, or with an invalid value given, is left unchanged. Available from Archicad 28.",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -38461,7 +38461,7 @@
        "properties": {
         "name": {
          "type": "string",
-         "description": "The name of the loaded library part file with its extension, as returned in the fileName field of GetAvailableLibraryParts (e.g. 'My Door.gsm'). A name without extension, as GetGDLParametersOfLibraryParts takes it, is looked up as '<name>.gsm' when no file has that name. The library part must be editable, i.e. loaded from a writable file, not from a library package, a BIMcloud or read-only library. When Archicad does not let the loaded part be modified, as in a saved project, a part of a local library folder is changed in its file, and a part of the embedded library in a temporary copy that then replaces it, keeping its main GUID; the libraries are reloaded after the call. When a part of the same name is in more than one library, the one Archicad finds by that name is changed."
+         "description": "The name of the loaded library part file with its extension, as returned in the fileName field of GetAvailableLibraryParts (e.g. 'My Door.gsm'). A name without extension, as GetGDLParametersOfLibraryParts takes it, is looked up as '<name>.gsm' when no file has that name. The library part must be editable, i.e. loaded from a writable file, not from a library package, a BIMcloud or read-only library. A part of a local library folder is changed in its file, and the libraries are reloaded after the call; a part of the embedded library only when Archicad reports it editable. When a part of the same name is in more than one library, the one Archicad finds by that name is changed."
         },
         "parameters": {
          "type": "array",
@@ -41921,7 +41921,7 @@
    "name": "GetViewSettings",
    "group": "Navigator Commands",
    "version": "1.1.4",
-   "description": "Gets the view settings of navigator items, including a view's own (custom) layer states",
+   "description": "Gets the view settings of navigator items",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -41964,7 +41964,7 @@
    "name": "SetViewSettings",
    "group": "Navigator Commands",
    "version": "1.1.4",
-   "description": "Sets the view settings of navigator items, including a view's own (custom) layer states",
+   "description": "Sets the view settings of navigator items",
    "inputSchema": {
     "type": "object",
     "properties": {
@@ -66271,13 +66271,6 @@
      "type": "string",
      "description": "The name of the layer combination. If empty, the view has custom layer combination."
     },
-    "customLayers": {
-     "type": "array",
-     "description": "The view's own layer settings (Archicad 27 and later): the layer states the view stores when it stores its layers (saveFlags.layers) under no layer combination name, as the View Settings dialog's \"Get Current Window's Settings\" stores them. GetViewSettings returns every layer of the set, ordered by layer index, and omits the field when the view stores no custom layers. SetViewSettings changes only the fields given of the layers listed; the other layers and fields keep what the view shows now (its custom layers, else its layer combination's states, else the layers' current states). It turns saveFlags.layers on and clears the layerCombination name, so it can't be given with a layerCombination name or with saveFlags.layers false. The view is read back, and a layer state Archicad did not keep fails the item.",
-     "items": {
-      "$ref": "#/ViewLayerState"
-     }
-    },
     "dimensionStyle": {
      "type": "string",
      "description": "The name of the dimension style. If empty, the view has custom dimension style."
@@ -66405,36 +66398,6 @@
    },
    "additionalProperties": false,
    "required": []
-  },
-  "ViewLayerState": {
-   "type": "object",
-   "description": "The state of one layer in a view's own (custom) layer settings. GetViewSettings returns every field; in SetViewSettings a field that is not given keeps its current value.",
-   "properties": {
-    "attributeId": {
-     "description": "The identifier of the Layer attribute.",
-     "$ref": "#/AttributeId"
-    },
-    "isHidden": {
-     "type": "boolean",
-     "description": "Whether the layer is hidden in the view."
-    },
-    "isLocked": {
-     "type": "boolean",
-     "description": "Whether the layer is locked in the view."
-    },
-    "isWireframe": {
-     "type": "boolean",
-     "description": "Whether the layer's elements are forced to wireframe in the view's 3D."
-    },
-    "intersectionGroupNr": {
-     "type": "integer",
-     "description": "Intersection group of the layer in the view. Elements on layers having the same group will be intersected."
-    }
-   },
-   "additionalProperties": false,
-   "required": [
-    "attributeId"
-   ]
   },
   "ViewSettingsOrError": {
    "type": "object",
@@ -68269,7 +68232,7 @@
   },
   "BeamSegmentModification": {
    "type": "object",
-   "description": "Changes one existing segment of a beam: its geometry and its surfaces, which take the shape of BeamSegmentSurfaces, so the segments GetDetailsOfElements returns can be sent back. Only the given fields change. Send overridden false to make a side take its surface from the cross section again.",
+   "description": "Changes one existing segment of a beam.",
    "properties": {
     "segmentIndex": {
      "type": "integer",
@@ -68278,34 +68241,6 @@
     },
     "geometry": {
      "$ref": "#/BeamSegmentGeometryModification"
-    },
-    "leftMaterial": {
-     "$ref": "#/OverriddenMaterial",
-     "description": "Overrides the surface of the left side of the segment."
-    },
-    "topMaterial": {
-     "$ref": "#/OverriddenMaterial",
-     "description": "Overrides the surface of the top of the segment."
-    },
-    "rightMaterial": {
-     "$ref": "#/OverriddenMaterial",
-     "description": "Overrides the surface of the right side of the segment."
-    },
-    "bottomMaterial": {
-     "$ref": "#/OverriddenMaterial",
-     "description": "Overrides the surface of the bottom of the segment."
-    },
-    "endsMaterial": {
-     "$ref": "#/OverriddenMaterial",
-     "description": "Overrides the surface of the beginning and end of the segment."
-    },
-    "extrusionMaterial": {
-     "$ref": "#/OverriddenMaterial",
-     "description": "Overrides the surface of the extrusion of a profiled segment. Written from Archicad 28; before that it gets a failed execution result."
-    },
-    "materialsChained": {
-     "type": "boolean",
-     "description": "Whether the surface materials are chained. Send false with surfaces that should differ from each other."
     }
    },
    "additionalProperties": false

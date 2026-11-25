@@ -346,9 +346,6 @@ GS::Array<GSIndex> GetPivotEdgeIndices (const API_ElementMemo& memo);
 API_Guid GetAttributeGuidFromIndex (API_AttrTypeID typeID, API_AttributeIndex index);
 API_Attr_Head GetAttributeHeadFromGuid (API_Guid guid);
 API_AttributeIndex GetAttributeIndexFromGuid (API_AttrTypeID typeID, API_Guid guid);
-// The index of the attribute of the given type that the "attributeId" of an array item names. False
-// when it names none, or names an attribute of another type.
-bool GetAttributeIndexFromAttributeId (const GS::ObjectState& attributeId, API_AttrTypeID attributeType, API_AttributeIndex& attributeIndex);
 
 // The veneer of a column segment (#1044): type ("Core", "Finish" or "Other"), thickness and,
 // for a segment with a building material cross section, the building material of the veneer.

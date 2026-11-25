@@ -3693,13 +3693,13 @@ Example: [archicad-addon/Examples/Element/ScaleElements.py](https://github.com/E
 
 ### DeleteElements
 
-Deletes elements, each in the database that contains it (the floor plan, a section, a worksheet, a layout, ...), whichever window is the current one; the current window stays. The zones of the call are deleted before all the other elements, so an automatic zone deleted together with its bounding walls is gone before its boundary is; deleting the boundary of an automatic zone without the zone itself can open Archicad's modal 'No closed polygon found' dialog, which blocks the command until someone clicks it in Archicad. Returns an execution result for each input element: an element that could not be deleted (for example because its layer is locked) or a guid that is not in the project gets a failed execution result instead of being skipped silently, and does not stop the other elements from being deleted. With dryRun true nothing is deleted and no undo step is created: the response has dryRun set to true, and each element that passes the checks made before deleting gets wouldDelete, so a script can preview a deletion before making it.
+Deletes elements. The zones of the call are deleted before all the other elements, so an automatic zone deleted together with its bounding walls is gone before its boundary is; deleting the boundary of an automatic zone without the zone itself can open Archicad's modal 'No closed polygon found' dialog, which blocks the command until someone clicks it in Archicad. Returns an execution result for each input element: an element that could not be deleted (for example because its layer is locked) or a guid that is not in the project gets a failed execution result instead of being skipped silently, and does not stop the other elements from being deleted. With dryRun true nothing is deleted and no undo step is created: the response has dryRun set to true, and each element that passes the checks made before deleting gets wouldDelete, so a script can preview a deletion before making it.
 
 Group: Element Commands. Added in Tapir 1.2.1. Docs: https://archicad-api.com/archicad-addon/#DeleteElements
 
 Parameters:
 
-- `elements` (Elements, required): The elements to delete, of any database (the floor plan, a section, a worksheet, a layout, ...): each is deleted in the database that contains it, whichever window is the current one, and the current window stays. The zones among them are deleted before all the others, so an automatic zone deleted together with its bounding elements is gone before its boundary is. Deleting the boundary of an automatic zone without the zone itself can open Archicad's modal 'No closed polygon found around the clicked point' dialog, which blocks the command until someone clicks it in Archicad.
+- `elements` (Elements, required): The elements to delete. The zones among them are deleted before all the others, so an automatic zone deleted together with its bounding elements is gone before its boundary is. Deleting the boundary of an automatic zone without the zone itself can open Archicad's modal 'No closed polygon found around the clicked point' dialog, which blocks the command until someone clicks it in Archicad.
 - `dryRun` (DryRun)
 
 Returns:
@@ -4105,7 +4105,7 @@ Example: [archicad-addon/Examples/Element/CreateWalls.py](https://github.com/ENZ
 
 ### CreateBeams
 
-Creates Beam elements based on the given parameters. Takes the same cut fill pens, cover fill and holes as ModifyBeams, besides the position, shape, slant and cross section; settings not given come from the Beam tool defaults or the favorite. Both commands take the same segments array, which sets the cross section, taper, length and surfaces of single segments. Not written by either command: the cut fill pens before Archicad 27.
+Creates Beam elements based on the given parameters. Takes the same cut fill pens, cover fill and holes as ModifyBeams, besides the position, shape, slant and cross section; settings not given come from the Beam tool defaults or the favorite. Both commands take the same segments array, which sets the cross section, taper and length of single segments. Not written by either command: the surfaces of the beam segments, and the cut fill pens before Archicad 27.
 
 Group: Element Commands. Added in Tapir 1.4.0. Docs: https://archicad-api.com/archicad-addon/#CreateBeams
 
@@ -4133,7 +4133,7 @@ Parameters:
   - `buildingMaterialId` (AttributeId): Cross section building material (round or rectangular, per circleBased). Applied to all segments.
   - `profileId` (AttributeId): Switches the cross section to this custom extruded profile (circleBased becomes false). Applied to all segments.
   - `segmentCount` (integer): Optional number of segments of the new beam, e.g. one per beam when beams with different cross sections are merged into one (segments then gives each its cross section and length). Added segments copy the last segment of the Beam tool defaults or the favorite, with a Basic structure; the joints between segments are vertical cuts. When the number changes, every segment gets the same proportional length unless segments sets its length. The beam is read back, and when Archicad did not keep the number it is deleted again and the item fails. Not taken by ModifyBeams: an existing beam keeps its number of segments.
-  - `segments` (array of BeamSegmentModification): Optional changes to single segments of the new beam, which has the segments of the Beam tool defaults or the favorite, or segmentCount segments: their cross section, taper, length and surfaces. Applied after segmentCount and the cross section given for all segments, so a segment given here keeps its own values. A segmentIndex the beam does not have is an error and the beam is not created.
+  - `segments` (array of BeamSegmentModification): Optional changes to single segments of the new beam, which has the segments of the Beam tool defaults or the favorite, or segmentCount segments: their cross section, taper and length. Applied after segmentCount and the cross section given for all segments, so a segment given here keeps its own values. A segmentIndex the beam does not have is an error and the beam is not created.
   - `holes` (array of BeamHoleModification): Optional holes of the new beam, in the shape ModifyBeams takes and GetDetailsOfElements returns them (centerX along the beam from begCoordinate). They are written right after the beam is created; a hole Archicad refuses fails the item and the beam is not created. When omitted, no holes are written.
   - `cutFillPen` (OverriddenPen): Overrides the pen of the cut fill. Written from Archicad 27.
   - `cutFillBackgroundPen` (OverriddenPen): Overrides the background pen of the cut fill. Written from Archicad 27.
@@ -5931,7 +5931,7 @@ Example: [archicad-addon/Examples/Element/ModifyWalls.py](https://github.com/ENZ
 
 ### ModifyBeams
 
-Modifies Beam elements based on the given parameters. CreateBeams takes the same cut fill pens, cover fill and holes, and the same absolute zCoordinate of the reference line (with an optional floorIndex), and the same segments array, which changes the cross section, taper, length and the left, top, right, bottom, ends and extrusion surfaces of single segments (the surfaces in the shape GetDetailsOfElements returns them) and leaves the others as they are. Also writes the floor plan display settings GetDetailsOfElements reads, under the same names: story visibility, display option, view depth, uncut and overhead projection modes, whether the contour lines and the reference axis are shown, and the pens and line types of the cut contour, uncut, overhead, hidden and reference lines; each is read back after the change, and one Archicad did not take fails the item. Not written: the cut fill pens before Archicad 27.
+Modifies Beam elements based on the given parameters. CreateBeams takes the same cut fill pens, cover fill and holes, and the same absolute zCoordinate of the reference line (with an optional floorIndex), and the same segments array, which changes the cross section, taper and length of single segments and leaves the others as they are. Also writes the floor plan display settings GetDetailsOfElements reads, under the same names: story visibility, display option, view depth, uncut and overhead projection modes, whether the contour lines and the reference axis are shown, and the pens and line types of the cut contour, uncut, overhead, hidden and reference lines; each is read back after the change, and one Archicad did not take fails the item. Not written: the surfaces of the beam segments, and the cut fill pens before Archicad 27.
 
 Group: Element Commands. Added in Tapir 1.4.0. Docs: https://archicad-api.com/archicad-addon/#ModifyBeams
 
@@ -5960,7 +5960,7 @@ Parameters:
   - `buildingMaterialId` (AttributeId): Cross section building material (round or rectangular, per circleBased). Applied to all segments.
   - `profileId` (AttributeId): Switches the cross section to this custom extruded profile (circleBased becomes false). Applied to all segments.
   - `holes` (array of BeamHoleModification): Replaces all holes currently placed on the beam.
-  - `segments` (array of BeamSegmentModification): Optional changes to single segments of the beam: their cross section, taper, length and surfaces. Only the segments and keys given change, so the neighbouring segments stay as they are. Applied after the cross section given for all segments. Segments are not added or removed; a segmentIndex the beam does not have, or a wrong surface, fails the item before anything of it is written.
+  - `segments` (array of BeamSegmentModification): Optional changes to single segments of the beam: their cross section, taper and length. Only the segments and keys given change, so the neighbouring segments stay as they are. Applied after the cross section given for all segments. Segments are not added or removed; a segmentIndex the beam does not have fails the item before anything of it is written.
   - `visibility` (StoryVisibility): The stories the beam is shown on (Show On Stories), for example { "showOnHome": true } for the home story only. Setting it without isAutoOnStoryVisibility turns the automatic story visibility off, which Archicad would otherwise recompute it from. The item fails when Archicad does not take the given combination.
   - `isAutoOnStoryVisibility` (boolean): When true, Archicad recomputes visibility automatically from the actual elevation of the beam and ignores a visibility given together with it.
   - `displayOption` (DisplayOption)
@@ -5989,7 +5989,7 @@ Returns:
 
 Grasshopper: `BeamsComponent`, `ModifyBeamsComponent`
 
-Example: [archicad-addon/Examples/Element/ModifyBeams.py](https://github.com/ENZYME-APD/tapir-archicad-automation/blob/main/archicad-addon/Examples/Element/ModifyBeams.py): Creates a beam, then changes its cross section and adds a round hole with ModifyBeams, gives its segment its own top and bottom surfaces, moves it: a new reference line and its absolute elevation (zCoordinate, as in CreateBeams), changes its floor plan display: home story only, cut contour pen 21 and dashed hidden lines, and tapers one segment of the beam with segments. Only the given fields change; holes replaces every hole of the beam. segments changes single segments, chosen by segmentIndex (0 for a beam of one segment): their surfaces, in the shape GetDetailsOfElements returns them, and, last, the taper of one segment. The display settings have the names GetDetailsOfElements reads them under, so what it returns can be sent back.
+Example: [archicad-addon/Examples/Element/ModifyBeams.py](https://github.com/ENZYME-APD/tapir-archicad-automation/blob/main/archicad-addon/Examples/Element/ModifyBeams.py): Creates a beam, then changes its cross section and adds a round hole with ModifyBeams, moves it: a new reference line and its absolute elevation (zCoordinate, as in CreateBeams), changes its floor plan display: home story only, cut contour pen 21 and dashed hidden lines, and tapers one segment of the beam with segments. Only the given fields change; holes replaces every hole of the beam. The display settings have the names GetDetailsOfElements reads them under, so what it returns can be sent back.
 
 ### ModifySlabs
 
@@ -10181,7 +10181,7 @@ Group: Attribute Commands. Added in Tapir 1.8.0. Docs: https://archicad-api.com/
 
 Parameters:
 
-- `ruleGroupNames` (array of string, required): The names of the rule groups in their new order. The groups not listed keep their order and follow the listed ones. Built-in groups, like the Renovation group, cannot be listed and keep their place.
+- `ruleGroupNames` (array of string, required): The names of the rule groups in their new order. The groups not listed keep their order and follow the listed ones.
 
 
 Grasshopper: `SetGraphicOverrideRuleGroupOrderComponent`
@@ -11058,7 +11058,7 @@ Example: [archicad-addon/Examples/Library/ResetLibraries.py](https://github.com/
 
 ### SetLibraryPartScripts
 
-Sets and deletes the master, parameter, 2D, 3D, properties, interface and forward and backward migration scripts of loaded library parts. Only the given scripts are changed; an empty script makes the section empty, deleteScripts removes it. A library part that is not editable (e.g. a part of a library package or a read-only library) is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.
+Sets and deletes the master, parameter, 2D, 3D, properties, interface and forward and backward migration scripts of loaded library parts. Only the given scripts are changed; an empty script makes the section empty, deleteScripts removes it. A library part that is not editable (e.g. a part of a library package or a read-only library) is refused and left unchanged. Available from Archicad 28.
 
 Group: Library Commands. Added in Tapir 1.7.3. Docs: https://archicad-api.com/archicad-addon/#SetLibraryPartScripts
 
@@ -11076,7 +11076,7 @@ Example: [archicad-addon/Examples/Library/SetLibraryPartScripts.py](https://gith
 
 ### SetLibraryPartMetadata
 
-Sets the author, keywords, license, license version, password and the placeable, UI default, subtype and hierarchical pages flags of loaded library parts. Only the given fields are changed. A library part that is not editable (e.g. a part of a library package or a read-only library) is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.
+Sets the author, keywords, license, license version, password and the placeable, UI default, subtype and hierarchical pages flags of loaded library parts. Only the given fields are changed. A library part that is not editable (e.g. a part of a library package or a read-only library) is refused and left unchanged. Available from Archicad 28.
 
 Group: Library Commands. Added in Tapir 1.8.0. Docs: https://archicad-api.com/archicad-addon/#SetLibraryPartMetadata
 
@@ -11115,7 +11115,7 @@ Example: [archicad-addon/Examples/Library/GetLibraryPartPictures.py](https://git
 
 ### SetLibraryPartPictures
 
-Deletes the preview picture, the GDL pictures (and from Archicad 29 their dark variants) or the 2D symbol of a loaded library part, or copies the 2D symbol from another library part. A library part that is not editable is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.
+Deletes the preview picture, the GDL pictures (and from Archicad 29 their dark variants) or the 2D symbol of a loaded library part, or copies the 2D symbol from another library part. A library part that is not editable is refused and left unchanged. Available from Archicad 28.
 
 Group: Library Commands. Added in Tapir 1.8.0. Docs: https://archicad-api.com/archicad-addon/#SetLibraryPartPictures
 
@@ -11158,7 +11158,7 @@ Example: [archicad-addon/Examples/Library/GetLibraryPartCustomSection.py](https:
 
 ### SetLibraryPartCustomSection
 
-Creates, replaces or deletes a custom section of a loaded library part. The content is given as base64. A library part that is not editable is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.
+Creates, replaces or deletes a custom section of a loaded library part. The content is given as base64. A library part that is not editable is refused and left unchanged. Available from Archicad 28.
 
 Group: Library Commands. Added in Tapir 1.8.0. Docs: https://archicad-api.com/archicad-addon/#SetLibraryPartCustomSection
 
@@ -11274,7 +11274,7 @@ Example: [archicad-addon/Examples/Library/GetLibraryPart2DPrimitives.py](https:/
 
 ### SetLibraryPartPictureImages
 
-Sets the preview picture and the GDL pictures of a loaded library part from base64 encoded PNGs, and from Archicad 29 also their dark user interface variants. All pictures are set in one step; an invalid picture changes nothing. A library part that is not editable is refused and left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.
+Sets the preview picture and the GDL pictures of a loaded library part from base64 encoded PNGs, and from Archicad 29 also their dark user interface variants. All pictures are set in one step; an invalid picture changes nothing. A library part that is not editable is refused and left unchanged. Available from Archicad 28.
 
 Group: Library Commands. Added in Tapir 2.0.0. Docs: https://archicad-api.com/archicad-addon/#SetLibraryPartPictureImages
 
@@ -11293,14 +11293,14 @@ Example: [archicad-addon/Examples/Library/SetLibraryPartPictureImages.py](https:
 
 ### SetLibraryPartParameters
 
-Sets the parameter values, and optionally the parameter descriptions, of loaded library parts, in the format of SetGDLParametersOfElements. Only the given parameters are changed; with merge, the changed list is merged into the parameters of the part instead of replacing them. A library part that is not editable, or with an invalid value given, is left unchanged. A part of the embedded library that Archicad does not report editable, as in a saved project, is changed in a temporary copy that then replaces it, keeping its main GUID, and the libraries are reloaded. Available from Archicad 28.
+Sets the parameter values, and optionally the parameter descriptions, of loaded library parts, in the format of SetGDLParametersOfElements. Only the given parameters are changed; with merge, the changed list is merged into the parameters of the part instead of replacing them. A library part that is not editable, or with an invalid value given, is left unchanged. Available from Archicad 28.
 
 Group: Library Commands. Added in Tapir 2.0.0. Docs: https://archicad-api.com/archicad-addon/#SetLibraryPartParameters
 
 Parameters:
 
 - `libraryParts` (array of object, required): The library parts to modify and the parameter values to set in each.
-  - `name` (string, required): The name of the loaded library part file with its extension, as returned in the fileName field of GetAvailableLibraryParts (e.g. 'My Door.gsm'). A name without extension, as GetGDLParametersOfLibraryParts takes it, is looked up as '<name>.gsm' when no file has that name. The library part must be editable, i.e. loaded from a writable file, not from a library package, a BIMcloud or read-only library. When Archicad does not let the loaded part be modified, as in a saved project, a part of a local library folder is changed in its file, and a part of the embedded library in a temporary copy that then replaces it, keeping its main GUID; the libraries are reloaded after the call. When a part of the same name is in more than one library, the one Archicad finds by that name is changed.
+  - `name` (string, required): The name of the loaded library part file with its extension, as returned in the fileName field of GetAvailableLibraryParts (e.g. 'My Door.gsm'). A name without extension, as GetGDLParametersOfLibraryParts takes it, is looked up as '<name>.gsm' when no file has that name. The library part must be editable, i.e. loaded from a writable file, not from a library package, a BIMcloud or read-only library. A part of a local library folder is changed in its file, and the libraries are reloaded after the call; a part of the embedded library only when Archicad reports it editable. When a part of the same name is in more than one library, the one Archicad finds by that name is changed.
   - `parameters` (array of object, required): The GDL parameters to change, by name, in the format SetGDLParametersOfElements uses. The parameters left out are not changed.
   - `descriptions` (array of string): The new descriptions of all parameters of the library part, one for each parameter in the order of its parameter list. Defaults to the current descriptions.
   - `merge` (boolean): When true, the changed parameter list is merged into the parameters of the library part (MergeParameters of the Archicad API) instead of replacing them (SetParameters). Defaults to false.
@@ -12433,7 +12433,7 @@ Example: [archicad-addon/Examples/Navigator/SetViewOptions.py](https://github.co
 
 ### GetViewSettings
 
-Gets the view settings of navigator items, including a view's own (custom) layer states
+Gets the view settings of navigator items
 
 Group: Navigator Commands. Added in Tapir 1.1.4. Docs: https://archicad-api.com/archicad-addon/#GetViewSettings
 
@@ -12451,7 +12451,7 @@ Example: [archicad-addon/Examples/Navigator/GetViewSettings.py](https://github.c
 
 ### SetViewSettings
 
-Sets the view settings of navigator items, including a view's own (custom) layer states
+Sets the view settings of navigator items
 
 Group: Navigator Commands. Added in Tapir 1.1.4. Docs: https://archicad-api.com/archicad-addon/#SetViewSettings
 
@@ -20227,7 +20227,6 @@ object: The identifier of a database
 object: The settings of a navigator view
 - `modelViewOptions` (string): The name of the model view options. If empty, the view has custom model view options.
 - `layerCombination` (string): The name of the layer combination. If empty, the view has custom layer combination.
-- `customLayers` (array of ViewLayerState): The view's own layer settings (Archicad 27 and later): the layer states the view stores when it stores its layers (saveFlags.layers) under no layer combination name, as the View Settings dialog's "Get Current Window's Settings" stores them. GetViewSettings returns every layer of the set, ordered by layer index, and omits the field when the view stores no custom layers. SetViewSettings changes only the fields given of the layers listed; the other layers and fields keep what the view shows now (its custom layers, else its layer combination's states, else the layers' current states). It turns saveFlags.layers on and clears the layerCombination name, so it can't be given with a layerCombination name or with saveFlags.layers false. The view is read back, and a layer state Archicad did not keep fails the item.
 - `dimensionStyle` (string): The name of the dimension style. If empty, the view has custom dimension style.
 - `penSetName` (string): The name of the pen set. If empty, the view has custom pen set.
 - `graphicOverrideCombination` (string): The name of the graphic override combination. If empty, the view has custom graphic override combination.
@@ -20254,15 +20253,6 @@ object: The settings of a navigator view
 - `d3styleName` (string): Name of the 3D style. Empty if not set.
 - `renderingSceneName` (string): Name of the rendering scene. Empty if not set.
 - `usePhotoRendering` (boolean): Whether photo rendering is used for this view.
-
-### ViewLayerState
-
-object: The state of one layer in a view's own (custom) layer settings. GetViewSettings returns every field; in SetViewSettings a field that is not given keeps its current value.
-- `attributeId` (AttributeId, required): The identifier of the Layer attribute.
-- `isHidden` (boolean): Whether the layer is hidden in the view.
-- `isLocked` (boolean): Whether the layer is locked in the view.
-- `isWireframe` (boolean): Whether the layer's elements are forced to wireframe in the view's 3D.
-- `intersectionGroupNr` (integer): Intersection group of the layer in the view. Elements on layers having the same group will be intersected.
 
 ### ViewSettingsOrError
 
@@ -20736,16 +20726,9 @@ object: The cross section, taper and length of a segment of a beam, in the shape
 
 ### BeamSegmentModification
 
-object: Changes one existing segment of a beam: its geometry and its surfaces, which take the shape of BeamSegmentSurfaces, so the segments GetDetailsOfElements returns can be sent back. Only the given fields change. Send overridden false to make a side take its surface from the cross section again.
+object: Changes one existing segment of a beam.
 - `segmentIndex` (integer): The segment to change, 0-based, in the order GetDetailsOfElements lists the beam's segments. Without it, the item's position in the segments array is used, so an empty item {} leaves its segment as it is.
 - `geometry` (BeamSegmentGeometryModification)
-- `leftMaterial` (OverriddenMaterial): Overrides the surface of the left side of the segment.
-- `topMaterial` (OverriddenMaterial): Overrides the surface of the top of the segment.
-- `rightMaterial` (OverriddenMaterial): Overrides the surface of the right side of the segment.
-- `bottomMaterial` (OverriddenMaterial): Overrides the surface of the bottom of the segment.
-- `endsMaterial` (OverriddenMaterial): Overrides the surface of the beginning and end of the segment.
-- `extrusionMaterial` (OverriddenMaterial): Overrides the surface of the extrusion of a profiled segment. Written from Archicad 28; before that it gets a failed execution result.
-- `materialsChained` (boolean): Whether the surface materials are chained. Send false with surfaces that should differ from each other.
 
 ### DetailWorksheetDetails
 

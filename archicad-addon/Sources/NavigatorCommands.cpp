@@ -1506,160 +1506,6 @@ GS::ObjectState SetViewOptionsCommand::Execute (const GS::ObjectState& parameter
     return {};
 }
 
-#ifdef ServerMainVers_2700
-
-// A view's own (Custom) layer settings: the layer states Archicad stores in the view when it stores
-// its layers (saveLaySet) under no layer combination name, as the View Settings dialog's "Get Current
-// Window's Settings" does. The table belongs to the caller: ACAPI_Navigator_GetNavigatorView
-// allocates it (FreeNavigatorView deletes it), and ACAPI_Navigator_ChangeNavigatorView only reads
-// the one it is given, as the DevKit's Navigator_Test example does.
-using LayerStatTable = GS::HashTable<API_AttributeIndex, API_LayerStat>;
-
-static constexpr short ViewLayerFlags = APILay_Hidden | APILay_Locked | APILay_ForceToWire;
-
-static bool HasCustomLayers (const API_NavigatorView& navigatorView)
-{
-    return navigatorView.saveLaySet && navigatorView.layerCombination[0] == '\0' && navigatorView.layerStats != nullptr;
-}
-
-static void CopyLayerStats (const LayerStatTable& source, LayerStatTable& target)
-{
-    for (const auto& kv : source) {
-#ifdef ServerMainVers_2800
-        target.Put (kv.key, kv.value);
-#else
-        target.Put (*kv.key, *kv.value);
-#endif
-    }
-}
-
-// The layer states ordered by layer index, so that the response does not depend on the order of
-// the hash table.
-static std::vector<std::pair<API_AttributeIndex, API_LayerStat>> SortedLayerStats (const LayerStatTable& stats)
-{
-    std::vector<std::pair<API_AttributeIndex, API_LayerStat>> sorted;
-    for (const auto& kv : stats) {
-#ifdef ServerMainVers_2800
-        sorted.emplace_back (kv.key, kv.value);
-#else
-        sorted.emplace_back (*kv.key, *kv.value);
-#endif
-    }
-    std::sort (sorted.begin (), sorted.end (), [] (const auto& a, const auto& b) {
-        return GetAttributeIndex (a.first) < GetAttributeIndex (b.first);
-    });
-    return sorted;
-}
-
-static GS::ObjectState CreateViewLayerStateObjectState (const API_AttributeIndex& layerIndex, const API_LayerStat& layerStat)
-{
-    return GS::ObjectState (
-        "attributeId", CreateGuidObjectState (GetAttributeGuidFromIndex (API_LayerID, layerIndex)),
-        "isHidden", (layerStat.lFlags & APILay_Hidden) != 0,
-        "isLocked", (layerStat.lFlags & APILay_Locked) != 0,
-        "isWireframe", (layerStat.lFlags & APILay_ForceToWire) != 0,
-        "intersectionGroupNr", layerStat.conClassId);
-}
-
-// The layer states a view shows before customLayers changes them: its own custom ones, else those
-// of the layer combination it stores, and for every layer neither has, the layer's current state.
-static GSErrCode GetLayerStatsOfView (const API_NavigatorView& navigatorView, LayerStatTable& stats)
-{
-    if (HasCustomLayers (navigatorView)) {
-        CopyLayerStats (*navigatorView.layerStats, stats);
-    } else if (navigatorView.saveLaySet && navigatorView.layerCombination[0] != '\0') {
-        GS::UniString combinationName (navigatorView.layerCombination);
-        API_Attribute combination = {};
-        combination.header.typeID = API_LayerCombID;
-        combination.header.uniStringNamePtr = &combinationName;
-        if (ACAPI_Attribute_Get (&combination) == NoError) {
-            API_AttributeDef combinationDef = {};
-            if (ACAPI_Attribute_GetDef (API_LayerCombID, combination.header.index, &combinationDef) == NoError) {
-                if (combinationDef.layer_statItems != nullptr) {
-                    CopyLayerStats (*combinationDef.layer_statItems, stats);
-                }
-                ACAPI_DisposeAttrDefsHdls (&combinationDef);
-            }
-        }
-    }
-
-    // The table gets an entry for every layer of the project, as a layer combination's has:
-    // Archicad reads a sparse layer combination table past its end (see CreateLayerCombinations).
-    GS::Array<API_Attribute> layers;
-    const GSErrCode err = ACAPI_Attribute_GetAttributesByType (API_LayerID, layers);
-    for (API_Attribute& layer : layers) {
-        if (!stats.ContainsKey (layer.header.index)) {
-            API_LayerStat layerStat = {};
-            layerStat.lFlags = static_cast<short> (layer.header.flags & ViewLayerFlags);
-            layerStat.conClassId = layer.layer.conClassId;
-            stats.Put (layer.header.index, layerStat);
-        }
-        DisposeAttribute (layer);
-    }
-    return err;
-}
-
-static void SetLayerFlag (const GS::ObjectState& layerState, const char* field, short flag, API_LayerStat& layerStat)
-{
-    bool value = false;
-    if (layerState.Get (field, value)) {
-        layerStat.lFlags = static_cast<short> (value ? (layerStat.lFlags | flag) : (layerStat.lFlags & ~flag));
-    }
-}
-
-// Applies customLayers to stats: only the fields given change, so a layer's other states and the
-// layers not listed keep what the view shows. Answers what is wrong with the input, if anything.
-static GS::Optional<GS::UniString> ApplyViewLayerStates (const GS::Array<GS::ObjectState>& customLayers, LayerStatTable& stats)
-{
-    for (UIndex i = 0; i < customLayers.GetSize (); ++i) {
-        const GS::ObjectState& layerState = customLayers[i];
-        API_AttributeIndex layerIndex;
-        if (!GetAttributeIndexFromAttributeId (layerState, API_LayerID, layerIndex)) {
-            return GS::UniString::Printf ("customLayers[%u]: the attributeId names no layer of the project.", i);
-        }
-        API_LayerStat layerStat = {};
-        layerStat.conClassId = 1;
-        if (stats.ContainsKey (layerIndex)) {
-            layerStat = stats[layerIndex];
-        }
-        SetLayerFlag (layerState, "isHidden", APILay_Hidden, layerStat);
-        SetLayerFlag (layerState, "isLocked", APILay_Locked, layerStat);
-        SetLayerFlag (layerState, "isWireframe", APILay_ForceToWire, layerStat);
-        Int32 intersectionGroupNr = 0;
-        if (layerState.Get ("intersectionGroupNr", intersectionGroupNr)) {
-            layerStat.conClassId = intersectionGroupNr;
-        }
-        stats.Put (layerIndex, layerStat);
-    }
-    return GS::NoValue;
-}
-
-// The guids of the layers whose state the view stores differently from the one written.
-static GS::UniString LayerStatsNotKept (const LayerStatTable& written, const API_NavigatorView& readBack)
-{
-    if (!HasCustomLayers (readBack)) {
-        return "the view does not store custom layers";
-    }
-    GS::UniString notKept;
-    for (const auto& item : SortedLayerStats (written)) {
-        const API_LayerStat& wanted = item.second;
-        bool kept = false;
-        if (readBack.layerStats->ContainsKey (item.first)) {
-            const API_LayerStat& stored = (*readBack.layerStats)[item.first];
-            kept = (stored.lFlags & ViewLayerFlags) == (wanted.lFlags & ViewLayerFlags) && stored.conClassId == wanted.conClassId;
-        }
-        if (!kept) {
-            if (!notKept.IsEmpty ()) {
-                notKept += ", ";
-            }
-            notKept += APIGuidToString (GetAttributeGuidFromIndex (API_LayerID, item.first));
-        }
-    }
-    return notKept;
-}
-
-#endif
-
 GetViewSettingsCommand::GetViewSettingsCommand () :
     CommandBase (CommonSchema::Used)
 {}
@@ -1752,15 +1598,6 @@ GS::ObjectState GetViewSettingsCommand::Execute (const GS::ObjectState& paramete
             "dimensions", navigatorView.saveDim,
             "penSet", navigatorView.savePenSet,
             "structureDisplay", navigatorView.saveStructureDisplay));
-
-#ifdef ServerMainVers_2700
-        if (HasCustomLayers (navigatorView)) {
-            const auto& customLayers = viewSetting.AddList<GS::ObjectState> ("customLayers");
-            for (const auto& item : SortedLayerStats (*navigatorView.layerStats)) {
-                customLayers (CreateViewLayerStateObjectState (item.first, item.second));
-            }
-        }
-#endif
 
         if (navigatorView.saveZoom) {
             viewSetting.Add ("zoom", GS::ObjectState (
@@ -1922,43 +1759,6 @@ GS::ObjectState SetViewSettingsCommand::Execute (const GS::ObjectState& paramete
         }
         const GS::OnExit freeView ([&navigatorView] () { FreeNavigatorView (navigatorView); });
 
-        // customLayers: the view's own layer states, starting from what the view shows now. They
-        // take the place of a layer combination, so the two can't be given together.
-        GS::Array<GS::ObjectState> customLayers;
-        const bool customLayersGiven = viewSettingsOS->Get ("customLayers", customLayers);
-#ifdef ServerMainVers_2700
-        std::unique_ptr<LayerStatTable> customLayerStats;
-        LayerStatTable writtenLayerStats;
-        if (customLayersGiven) {
-            GS::UniString layerCombinationName;
-            bool storeLayers = true;
-            const GS::ObjectState* givenSaveFlagsOS = viewSettingsOS->Get ("saveFlags");
-            if ((viewSettingsOS->Get ("layerCombination", layerCombinationName) && !layerCombinationName.IsEmpty ()) ||
-                (givenSaveFlagsOS != nullptr && givenSaveFlagsOS->Get ("layers", storeLayers) && !storeLayers)) {
-                executionResults (CreateFailedExecutionResult (APIERR_BADPARS,
-                    "customLayers stores the view's own layer settings, so it can't be given with a layerCombination name or with saveFlags.layers false. Nothing was written."));
-                continue;
-            }
-            customLayerStats = std::make_unique<LayerStatTable> ();
-            err = GetLayerStatsOfView (navigatorView, *customLayerStats);
-            if (err != NoError) {
-                executionResults (CreateFailedExecutionResult (err, "Failed to read the layers of the project for customLayers. Nothing was written."));
-                continue;
-            }
-            const GS::Optional<GS::UniString> layerError = ApplyViewLayerStates (customLayers, *customLayerStats);
-            if (layerError.HasValue ()) {
-                executionResults (CreateFailedExecutionResult (APIERR_BADPARS, *layerError + " Nothing was written."));
-                continue;
-            }
-            CopyLayerStats (*customLayerStats, writtenLayerStats);
-        }
-#else
-        if (customLayersGiven) {
-            executionResults (CreateFailedExecutionResult (APIERR_NOTSUPPORTED, "customLayers needs Archicad 27 or later. Nothing was written."));
-            continue;
-        }
-#endif
-
         SetCharProperty (viewSettingsOS, "modelViewOptions", navigatorView.modelViewOptName);
         SetCharProperty (viewSettingsOS, "layerCombination", navigatorView.layerCombination);
         SetCharProperty (viewSettingsOS, "dimensionStyle", navigatorView.dimName);
@@ -2070,15 +1870,6 @@ GS::ObjectState SetViewSettingsCommand::Execute (const GS::ObjectState& paramete
             saveFlagsOS->Get ("structureDisplay", navigatorView.saveStructureDisplay);
         }
 
-#ifdef ServerMainVers_2700
-        if (customLayerStats != nullptr) {
-            delete navigatorView.layerStats;
-            navigatorView.layerStats = customLayerStats.release ();
-            navigatorView.layerCombination[0] = '\0';
-            navigatorView.saveLaySet = true;
-        }
-#endif
-
         err = ACAPI_Navigator_ChangeNavigatorView (&navigatorItem, &navigatorView);
         if (err != NoError) {
             executionResults (CreateFailedExecutionResult (err, "Failed to set navigator item view settings"));
@@ -2105,25 +1896,6 @@ GS::ObjectState SetViewSettingsCommand::Execute (const GS::ObjectState& paramete
                 continue;
             }
         }
-
-#ifdef ServerMainVers_2700
-        // The view is read back to report whether Archicad kept the layer states given.
-        if (customLayersGiven) {
-            API_NavigatorView changedNavigatorView = {};
-            err = ACAPI_Navigator_GetNavigatorView (&navigatorItem, &changedNavigatorView);
-            if (err != NoError) {
-                executionResults (CreateFailedExecutionResult (err, "The view settings were written, but the view could not be read back to check the customLayers."));
-                continue;
-            }
-            const GS::OnExit freeChangedView ([&changedNavigatorView] () { FreeNavigatorView (changedNavigatorView); });
-            const GS::UniString notKept = LayerStatsNotKept (writtenLayerStats, changedNavigatorView);
-            if (!notKept.IsEmpty ()) {
-                executionResults (CreateFailedExecutionResult (APIERR_GENERAL,
-                    "Archicad did not keep the customLayers written (" + notKept + "). The other view settings given were written."));
-                continue;
-            }
-        }
-#endif
 
         executionResults (CreateSuccessfulExecutionResult ());
     }

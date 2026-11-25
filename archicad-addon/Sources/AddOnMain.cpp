@@ -2654,11 +2654,11 @@ GSErrCode Initialize (void)
         );
         err |= RegisterCommand<GetViewSettingsCommand> (
             navigatorCommands, "1.1.4",
-            "Gets the view settings of navigator items, including a view's own (custom) layer states"
+            "Gets the view settings of navigator items"
         );
         err |= RegisterCommand<SetViewSettingsCommand> (
             navigatorCommands, "1.1.4",
-            "Sets the view settings of navigator items, including a view's own (custom) layer states"
+            "Sets the view settings of navigator items"
         );
         err |= RegisterCommand<GetActiveGraphicalOverrideCombinationCommand> (
             navigatorCommands, "1.7.2",
